@@ -1,0 +1,122 @@
+DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos:
+  genEventSumw: 9.565042170194016e+18
+DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 504833804689.01276
+DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 423239418874.17426
+DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 113668413845.13898
+DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 96233328.0
+DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 3323477295419.9956
+DYJetsToLL_Pt-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 102384412213.10405
+DYJetsToLL_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 16499054990.256784
+DYJetsToLL_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 145997724.61668503
+DYJetsToLL_Pt-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 1978968.2558893005
+DYJetsToLL_Pt-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 195559.10048626
+DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 17004433.0
+DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 26202328.0
+DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 18455718.0
+DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 8682257.0
+DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 7035971.0
+DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 6554679.0
+DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 5966661.0
+DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
+  genEventSumw: 1978203.0
+GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4970000.0
+GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4985000.0
+GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4784000.0
+GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4986000.0
+GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4998000.0
+GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4864000.0
+GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4958000.0
+GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8:
+  genEventSumw: 4992000.0
+GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 500000.0
+GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 500000.0
+GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 500000.0
+GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 500000.0
+GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 498000.0
+GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 976000.0
+GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 994626.0
+GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8:
+  genEventSumw: 493998.0
+ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8:
+  genEventSumw: 251577073.21000004
+ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8:
+  genEventSumw: 253205489.0751999
+ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8:
+  genEventSumw: 355945896.5544001
+ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8:
+  genEventSumw: 365675749.6428
+ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 68767082.31869161
+tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 1085960.6354470404
+TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8:
+  genEventSumw: 10457566706.558405
+TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8:
+  genEventSumw: 3502613.3919518394
+TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8:
+  genEventSumw: 656374.2728368
+TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 4782962.671003081
+TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 10134247.36974
+WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8:
+  genEventSumw: 107135826.44500002
+WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8:
+  genEventSumw: 83145979.09836999
+ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8:
+  genEventSumw: 55393058.96873599
+EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8:
+  genEventSumw: 1000000.0
+EWKWPlus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8:
+  genEventSumw: 4488000.0
+EWKWMinus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8:
+  genEventSumw: 4479000.0
+WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 51638.257653960005
+WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 42310.517360879996
+WZZ_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 571468.6796678341
+ZZZ_TuneCP5_13TeV-amcatnlo-pythia8:
+  genEventSumw: 3690.7843549759996
+VBS_OSWW_LL_TuneCP5_13TeV-madgraph-pythia8:
+  genEventSumw: 998000.0
+VBS_OSWW_TT_TuneCP5_13TeV-madgraph-pythia8:
+  genEventSumw: 1000000.0
+VBS_OSWW_TL_TuneCP5_13TeV-madgraph-pythia8:
+  genEventSumw: 944000.0
+VBS_OSWW_LT_TuneCP5_13TeV-madgraph-pythia8:
+  genEventSumw: 944000.0
+VBS_SSWW_cW_INT_TuneCP5_13TeV-madgraph-pythia8:
+  genEventSumw: 111932.0
