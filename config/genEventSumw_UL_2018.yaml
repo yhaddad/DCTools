@@ -7,11 +7,11 @@ DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
 DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   genEventSumw: 113668413845.13898
 DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8:
-  genEventSumw: 96233328.0
+  genEventSumw: 94707767.0
 DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  genEventSumw: 3323477295419.9956
+  genEventSumw: 3307136761790.048
 DYJetsToLL_Pt-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  genEventSumw: 102384412213.10405
+  genEventSumw: 102306915902.46965
 DYJetsToLL_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   genEventSumw: 16499054990.256784
 DYJetsToLL_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
@@ -31,7 +31,7 @@ DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
 DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
   genEventSumw: 7035971.0
 DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
-  genEventSumw: 6554679.0
+  genEventSumw: 6487578.0
 DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
   genEventSumw: 5966661.0
 DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8:
@@ -51,7 +51,7 @@ GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8:
 GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8:
   genEventSumw: 4958000.0
 GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8:
-  genEventSumw: 4992000.0
+  genEventSumw: 4236000.0
 GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8:
   genEventSumw: 500000.0
 GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8:
@@ -71,7 +71,7 @@ GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8:
 ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8:
   genEventSumw: 251577073.21000004
 ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8:
-  genEventSumw: 253205489.0751999
+  genEventSumw: 252426756.27519995
 ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8:
   genEventSumw: 355945896.5544001
 ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8:
@@ -81,7 +81,7 @@ ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8:
 tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8:
   genEventSumw: 1085960.6354470404
 TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8:
-  genEventSumw: 10457566706.558405
+  genEventSumw: 10452805985.684605
 TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8:
   genEventSumw: 3502613.3919518394
 TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8:
@@ -95,11 +95,13 @@ WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8:
 WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   genEventSumw: 83145979.09836999
 ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8:
-  genEventSumw: 55393058.96873599
+  genEventSumw: 54300570.247466
+ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8:
+  genEventSumw: 385000.0
 EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8:
   genEventSumw: 1000000.0
 EWKWPlus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8:
-  genEventSumw: 4488000.0
+  genEventSumw: 3294000.0
 EWKWMinus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8:
   genEventSumw: 4479000.0
 WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8:
@@ -119,4 +121,4 @@ VBS_OSWW_TL_TuneCP5_13TeV-madgraph-pythia8:
 VBS_OSWW_LT_TuneCP5_13TeV-madgraph-pythia8:
   genEventSumw: 944000.0
 VBS_SSWW_cW_INT_TuneCP5_13TeV-madgraph-pythia8:
-  genEventSumw: 111932.0
+  genEventSumw: 96182.0

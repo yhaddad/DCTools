@@ -4,7 +4,7 @@ import numpy as np
 import uproot
 import os
 import re
-from . import methods
+import boost_histogram as bh
 
 __all__ = ['datacard', 'datagroup', "plot"]
 
@@ -24,81 +24,64 @@ class datagroup:
         self.nominal = {}
         self.systvar = set()
         self.rebin = rebin
+
         # droping bins the same way as droping elements in numpy arrays a[1:3]
         self.binrange = binrange
 
         for fn in self._files:
-            _proc = os.path.basename(fn).replace(".root", "")
+            print("file : ", fn)
             _file = uproot.open(fn)
-
             if not _file:
-                raise ValueError("%s is not a valid rootfile" % self.name)
+              raise ValueError("%s is not a valid rootfile" % self.name)
+
+            histograms = None
+            if isinstance(channel, str):
+                histograms = _file.items(
+                  filter_classname="TH1*", 
+                  filter_name='*' + observable + "*" + channel + "*"
+                )
+                histograms.sort(reverse=True)
+                mergecat = False
+            else:
+                raise ValueError("%s DCTools not not accept yet list of channels" % self.name)
+            
+            if len(histograms) == 0:
+              raise ValueError("ERROR: there is no histogram found in this file")
+            else:
+              _proc = re.search(f"{observable}_(.+?)_{channel}", histograms[0][0]).group(1)
+
+            print('_proc : ', _proc)
             _scale = 1
             if ptype.lower() != "data":
                 _scale = self.xs_scale(ufile=_file, proc=_proc)
                 _scale *= kfactor
 
-            histograms = None
-            if isinstance(channel, str):
-                histograms = _file.allitems(
-                    filterclass=lambda cls: issubclass(
-                        cls, uproot_methods.classes.TH1.Methods
-                    ),
-                    filtername=lambda name: (
-                        observable in name.decode(
-                            "utf-8") and channel in name.decode("utf-8")
-                    )
-                )
-                histograms.sort(reverse=True)
-                mergecat = False
-
-            else:
-                histograms = _file.allitems(
-                    filterclass=lambda cls: issubclass(
-                        cls, uproot_methods.classes.TH1.Methods
-                    ),
-                    filtername=lambda name: (
-                        observable in name.decode("utf-8") and np.any(
-                            [cat in name.decode("utf-8") for cat in channel]
-                        )
-                    )
-                )
-                histograms.sort(reverse=True)
-                self.channel = [
-                    "cat0Jet" if "catSignal-0jet" in n else n for n in self.channel
-                ]
-                self.channel = [
-                    "cat1Jet" if "catSignal-1jet" in n else n for n in self.channel
-                ]
-
             for name, roothist in histograms:
-                name = name.decode("utf-8")
                 name = name.replace(_proc, self.name)
                 name = name.replace(";1", "")
 
                 if ptype.lower() == "signal":
                     name = name.replace(self.name, "signal")
-                if "catSignal-0jet" in name:
-                    name = name.replace("catSignal-0jet", "cat0Jet")
-                if "catSignal-1jet" in name:
-                    name = name.replace("catSignal-1jet", "cat1Jet")
 
                 roothist = self.check_shape(roothist)
-                ph_hist = roothist.physt()
-                newhist = physt.histogram1d.Histogram1D(
-                    ph_hist.binning,
-                    ph_hist.frequencies,
-                    errors2=roothist.variances
-                ) * _scale
-                # select bin per range
+                ph_hist = roothist.to_boost() * _scale
+                print(" --------- ")
+                print(ph_hist)
+                print(" --------- ")
+                
                 if isinstance(self.binrange, list):
-                    newhist = physt.histogram1d.Histogram1D(
-                        physt.binnings.NumpyBinning(
-                            ph_hist.numpy_bins[self.binrange[0]:self.binrange[1]]),
-                        ph_hist.frequencies[self.binrange[0]:self.binrange[1]],
-                        errors2=roothist.variances[self.binrange[0]
-                            :self.binrange[1]]
-                    ) * _scale
+                  newhist = bh.Histogram(
+                    bh.axis.Variable(
+                      ph_hist.axes.edges[0][self.binrange[0]:self.binrange[1]]
+                    )
+                  ).fill()
+                  # newhist = physt.histogram1d.Histogram1D(
+                  #     physt.binnings.NumpyBinning(
+                  #         ph_hist.numpy_bins[self.binrange[0]:self.binrange[1]]),
+                  #     ph_hist.frequencies[self.binrange[0]:self.binrange[1]],
+                  #     errors2=roothist.variances[self.binrange[0]
+                  #         :self.binrange[1]]
+                  # ) * _scale
 
                 # merge bins
                 if self.rebin >= 1:
@@ -230,7 +213,7 @@ class datagroup:
             fout.close()
 
     def xs_scale(self, ufile, proc):
-        xsec = self.xsec[proc]["xsec"]
+        xsec  = self.xsec[proc]["xsec"]
         xsec *= self.xsec[proc]["kr"]
         xsec *= self.xsec[proc]["br"]
         xsec *= 1000.0
@@ -238,9 +221,9 @@ class datagroup:
         assert xsec > 0, "{} has a null cross section!".format(proc)
         scale = 1.0
         try:
-            scale = xsec * self.lumi/ufile["Runs"].array("genEventSumw").sum()
+            scale = xsec * self.lumi/ufile["genEventSumw"].to_boost().sum().value
         except:
-            scale = xsec * self.lumi/ufile["Runs"].array("genEventSumw_").sum()
+            scale = xsec * self.lumi/ufile["genEventSumw"].to_boost().sum().value
         return scale
 
 
