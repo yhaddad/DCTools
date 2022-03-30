@@ -87,7 +87,7 @@ def main():
         datasets[p.name] = p
         if p.ptype == "signal":
             signal = p.name
-    return
+            
     card_name = "ch"+options.era
     if isinstance(options.channel, str):
         card_name = options.channel+options.era

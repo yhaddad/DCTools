@@ -63,40 +63,14 @@ class datagroup:
                 if ptype.lower() == "signal":
                     name = name.replace(self.name, "signal")
 
-                roothist = self.check_shape(roothist)
+                #roothist = self.check_shape(roothist)
                 ph_hist = roothist.to_boost() * _scale
-                print(" --------- ")
-                print(ph_hist)
-                print(" --------- ")
-                
-                if isinstance(self.binrange, list):
-                  newhist = bh.Histogram(
-                    bh.axis.Variable(
-                      ph_hist.axes.edges[0][self.binrange[0]:self.binrange[1]]
-                    )
-                  ).fill()
-                  # newhist = physt.histogram1d.Histogram1D(
-                  #     physt.binnings.NumpyBinning(
-                  #         ph_hist.numpy_bins[self.binrange[0]:self.binrange[1]]),
-                  #     ph_hist.frequencies[self.binrange[0]:self.binrange[1]],
-                  #     errors2=roothist.variances[self.binrange[0]
-                  #         :self.binrange[1]]
-                  # ) * _scale
 
-                # merge bins
-                if self.rebin >= 1:
-                    rebinned_hist = newhist.merge_bins(rebin)
-                    newhist = physt.histogram1d.Histogram1D(
-                        physt.binnings.NumpyBinning(rebinned_hist.numpy_bins),
-                        rebinned_hist.frequencies,
-                        errors2=rebinned_hist.errors2
-                    )
-
-                newhist.name = name
+                ph_hist.name = name
                 if name in self.nominal.keys():
-                    self.nominal[name] += newhist
+                    self.nominal[name] += ph_hist
                 else:
-                    self.nominal[name] = newhist
+                    self.nominal[name] = ph_hist
 
                 try:
                     self.systvar.add(re.search("sys_[\w.]+", name).group())
