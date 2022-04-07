@@ -30,7 +30,7 @@ def main():
     parser.add_argument("-ns" , "--nostatuncert", action="store_false")
     parser.add_argument("--binrange" ,nargs='+', type=int, default=0)
     parser.add_argument("--rebin" ,type=int, default=1)
-    parser.add_argument("-xs" , "--xsection", type=str, default="config/xsections_ERA.yaml")
+    parser.add_argument("-xs" , "--xsection", type=str, default="")
     parser.add_argument("--onexsec", action="store_true")
 
     options = parser.parse_args()
@@ -54,12 +54,13 @@ def main():
             print (exc)
 
     xsections = None
-    with open(options.xsection.replace("ERA", options.era)) as f:
-        print(" -- cross section file : ", options.xsection.replace("ERA", options.era))
-        try:
-            xsections = yaml.safe_load(f.read())
-        except yaml.YAMLError as exc:
-            print (exc)
+    if options.xsection is None or options.xsection == "":
+        with open(options.xsection.replace("ERA", options.era)) as f:
+            print(" -- cross section file : ", options.xsection.replace("ERA", options.era))
+            try:
+                xsections = yaml.safe_load(f.read())
+            except yaml.YAMLError as exc:
+                print (exc)
     if options.onexsec:
         xsections = { s: {'br': 1.0, 'kr': 1.0, 'xsec': 1.0} for s, xs in xsections.items()}
 
