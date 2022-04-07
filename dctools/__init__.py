@@ -187,9 +187,13 @@ class datagroup:
             fout.close()
 
     def xs_scale(self, ufile, proc):
-        xsec  = self.xsec[proc]["xsec"]
-        xsec *= self.xsec[proc]["kr"]
-        xsec *= self.xsec[proc]["br"]
+        xsec = 1.0
+        try:
+            xsec  = getattr(self.xsec[proc], "xsec", 1.0)
+            xsec *= getattr(self.xsec[proc], "kr", 1.0)
+            xsec *= getattr(self.xsec[proc], "br", 1.0)
+        except:
+            pass
         xsec *= 1000.0
         #print (proc, xsec)
         assert xsec > 0, "{} has a null cross section!".format(proc)
