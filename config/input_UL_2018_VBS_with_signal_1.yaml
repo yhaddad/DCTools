@@ -1,7 +1,9 @@
 VVV:
   files:
+    - ./eos/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
     - ./eos/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
     - ./eos/WZZ_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+    - ./eos/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
   type:
     background
   color: 38
@@ -37,11 +39,11 @@ WW:
   type:
     background
   color: 842
-Signal:
+VBS:
   files:
     - ./eos/ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8/merge.root
   type:
-    background
+    signal
   color: 895
 WZ:
   files:
@@ -53,13 +55,21 @@ WZ:
 DY:
   files:
     - ./eos/DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/merge.root
-    - ./eos/DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
-    - ./eos/DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
-    - ./eos/DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
-    - ./eos/DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
-    - ./eos/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
-    - ./eos/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
-    - ./eos/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
+    # - ./eos/DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    # - ./eos/DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    # - ./eos/DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
     - ./eos/EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8/merge.root
   type:
     background
@@ -81,7 +91,7 @@ TOP:
   type:
     background
   color: 124
-  kfactor: 2.0
+  kfactor: 2.5
 data:
   files:
     - ./eos/DoubleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root

@@ -29,10 +29,9 @@ class datagroup:
         self.binrange = binrange
 
         for fn in self._files:
-            print("file : ", fn)
             _file = uproot.open(fn)
             if not _file:
-              raise ValueError("%s is not a valid rootfile" % self.name)
+              raise ValueError("%s is not a valid rootfile" % fn)
 
             histograms = None
             if isinstance(channel, str):
@@ -45,50 +44,71 @@ class datagroup:
             else:
                 raise ValueError("%s DCTools not not accept yet list of channels" % self.name)
             
+            # this is temporary
+            histograms = list(filter(lambda hh: '_flat' not in hh[0], histograms))
+
+
             if len(histograms) == 0:
-              raise ValueError("ERROR: there is no histogram found in this file")
+              raise ValueError(f"ERROR: there is no histogram found in {fn}")
             else:
               _proc = re.search(f"{observable}_(.+?)_{channel}", histograms[0][0]).group(1)
 
-            print('_proc : ', _proc)
             _scale = 1
             if ptype.lower() != "data":
                 _scale = self.xs_scale(ufile=_file, proc=_proc)
                 _scale *= kfactor
 
             for name, roothist in histograms:
-                name = name.replace(_proc, self.name)
-                name = name.replace(";1", "")
+              name = name.replace(_proc, self.name)
+              name = name.replace(";1", "")
+              
+              print("before:", name)
+              if ptype.lower() == "signal":
+                  name = name.replace(self.name, "signal")
+              if "catSignal-0jet" in name:
+                  name = name.replace("catSignal-0jet", "cat0Jet")
+              if "catSignal-1jet" in name:
+                  name = name.replace("catSignal-1jet", "cat1Jet")
+              
+              print("name : ", name)
+              #roothist = self.check_shape(roothist)
+              ph_hist = roothist.to_boost() * _scale
 
-                if ptype.lower() == "signal":
-                    name = name.replace(self.name, "signal")
+              ph_hist.name = name
+              ph_hist.axes[0].name = observable
+              ph_hist.title = name
+              
+              # rebin / re-range
+              if not isinstance(self.binrange, list):
+                  self.binrange = [
+                      ph_hist.axes[0].edges[ 0], 
+                      ph_hist.axes[0].edges[-1]]
 
-                #roothist = self.check_shape(roothist)
-                ph_hist = roothist.to_boost() * _scale
+              if isinstance(self.binrange, list) or self.rebin >= 1:
+                  ph_hist = ph_hist[
+                      bh.loc(self.binrange[0]):bh.loc(self.binrange[1]):bh.rebin(self.rebin)
+                  ]
 
-                ph_hist.name = name
-                if name in self.nominal.keys():
-                    self.nominal[name] += ph_hist
-                else:
-                    self.nominal[name] = ph_hist
+              if name in self.nominal.keys():
+                self.nominal[name] = self.nominal[name] + ph_hist
+              else:
+                self.nominal[name] = ph_hist
 
-                try:
-                    self.systvar.add(re.search("sys_[\w.]+", name).group())
-                except:
-                    pass
+              try:
+                self.systvar.add(re.search("sys_[\w.]+", name).group())
+              except:
+                pass
 
         if mergecat:
-            # merging the nominal
-            self.merged = {}
-            for syst in self.systvar:
-                m_hist = self.merge_cat(
-                    self.nominal, lambda elem: syst in elem[0])
-                self.merged[m_hist[0]] = m_hist
-            m_hist = self.merge_cat(
-                self.nominal, lambda elem: "sys" not in elem[0])
+          # merging the nominal
+          self.merged = {}
+          for syst in self.systvar:
+            m_hist = self.merge_cat(self.nominal, lambda elem: syst in elem[0])
             self.merged[m_hist[0]] = m_hist
+          m_hist = self.merge_cat(self.nominal, lambda elem: "sys" not in elem[0])
+          self.merged[m_hist[0]] = m_hist
         else:
-            self.merged = {i: (i, c) for i, c in self.nominal.items()}
+          self.merged = {i: (i, c) for i, c in self.nominal.items()}
 
     def check_shape(self, histogram):
         for ibin in range(histogram.numbins+1):
@@ -160,14 +180,19 @@ class datagroup:
 
     def get(self, systvar, merged=True):
         shapeUp, shapeDown = None, None
+        print(" SYS : ", systvar)
         for n, hist in self.merged.items():
-            if "sys" not in n and systvar == "nom":
-                return hist[1]
-            elif systvar in n:
-                if "Up" in n:
-                    shapeUp = hist[1]
-                if "Down" in n:
-                    shapeDown = hist[1]
+          if "sys" not in n and systvar == "nom":
+            return hist[1]
+          elif systvar in n:
+            if "Up" in n:
+              # print("---> Up   : ", n)
+              shapeUp = hist[1]
+            if "Down" in n:
+              # print("---> Down : ", n)
+              shapeDown = hist[1]
+        if shapeUp is None or shapeDown is None:
+          print(f"[WARNING] {systvar} is not found in the input file, please check!")        
         return (shapeUp, shapeDown)
 
     def save(self, filename=None, working_dir="fitroom", force=True):
@@ -218,6 +243,7 @@ class datacard:
         self.nuisances = {}
         self.extras = set()
         self.dc_name = "cards-{}/shapes-{}.dat".format(name, channel)
+        # print("dc_name: ", self.dc_name, " --> ", name, channel)
         if not os.path.isdir(os.path.dirname(self.dc_name)):
             os.mkdir(os.path.dirname(self.dc_name))
 
@@ -232,10 +258,10 @@ class datacard:
         self.dc_file.append(lines)
 
     def add_observation(self, shape):
-        value = shape.total
+        value = shape.sum().value
         self.dc_file.append("bin          {0:>10}".format(self.channel))
         self.dc_file.append("observation  {0:>10}".format(value))
-        self.shape_file["data_obs"] = methods.from_physt(shape)
+        self.shape_file["data_obs"] = shape
 
     def add_nuisance(self, process, name, value):
         if name not in self.nuisances:
@@ -243,9 +269,9 @@ class datacard:
         self.nuisances[name][process] = value
 
     def add_nominal(self, process, shape):
-        value = shape.total
+        value = shape.sum().value
         self.rates.append((process, value))
-        self.shape_file[process] = methods.from_physt(shape)
+        self.shape_file[process] = shape
         self.nominal_hist = shape
 
     def add_qcd_scales(self, process, cardname, qcd_scales):
@@ -253,18 +279,18 @@ class datacard:
         if isinstance(qcd_scales, list):
             shapes = []
             for sh in qcd_scales:
-                uncert_up = np.abs(self.nominal_hist - sh[0])
-                uncert_dw = np.abs(self.nominal_hist - sh[1])
+                uncert_up = np.abs(self.nominal_hist.values(0) - sh[0].values(0))
+                uncert_dw = np.abs(self.nominal_hist.values(0) - sh[1].values(0))
 
                 var_up = np.divide(
-                    uncert_up, self.nominal_hist.frequencies,
+                    uncert_up, self.nominal_hist.values(0),
                     out=np.zeros_like(uncert_up),
-                    where=self.nominal_hist.frequencies != 0
+                    where=self.nominal_hist.values(0) != 0
                 )
                 var_dw = np.divide(
-                    uncert_dw, self.nominal_hist.frequencies,
+                    uncert_dw, self.nominal_hist.values(0),
                     out=np.zeros_like(uncert_up),
-                    where=self.nominal_hist.frequencies != 0
+                    where=self.nominal_hist.values(0) != 0
                 )
                 uncert_up[var_up >= 0.95] = 0
                 uncert_dw[var_dw >= 0.95] = 0
@@ -272,59 +298,71 @@ class datacard:
                 uncert = np.maximum(uncert_up, uncert_dw)
 
                 uncert_r = np.divide(
-                    uncert, self.nominal_hist.frequencies,
+                    uncert, self.nominal_hist.values(0),
                     out=np.zeros_like(uncert)*-1,
-                    where=self.nominal_hist.frequencies != 0
+                    where=self.nominal_hist.values(0) != 0
                 )
-#                     print(" ---  name : ", self.nominal_hist.name, " : ", process, " : ", cardname)
-#                     print("       up  : ", var_up)
-#                     print("       down: ", var_dw)
-#                     print("corr uncert: ", uncert_r)
                 shapes.append(uncert)
             shapes = np.array(shapes)
             uncert = shapes.max(axis=0)
-            h_uncert = physt.histogram1d.Histogram1D(
-                self.nominal_hist.binning, uncert,
-                errors2=np.zeros_like(uncert)
+            
+            h_uncert_up = bh.Histogram(
+              bh.axis.Variable(self.nominal_hist.axes[0].edges),
+            ).fill(
+              self.nominal_hist.axes[0].centers,
+              weight=self.nominal_hist.values(0) + uncert
             )
-            shape = (self.nominal_hist - h_uncert,
-                     self.nominal_hist + h_uncert)
+            
+            h_uncert_dw = bh.Histogram(
+              bh.axis.Variable(self.nominal_hist.axes[0].edges),
+            ).fill(
+              self.nominal_hist.axes[0].centers,
+              weight=self.nominal_hist.values(0) - uncert
+            )
+
+            shape = (h_uncert_dw,h_uncert_up)
             self.add_nuisance(process, nuisance, 1.0)
-            self.shape_file[process + "_" + cardname +
-                            "Up"] = methods.from_physt(shape[0])
-            self.shape_file[process + "_" + cardname +
-                            "Down"] = methods.from_physt(shape[1])
+            self.shape_file[process + "_" + cardname + "Up"] = shape[0]
+            self.shape_file[process + "_" + cardname + "Down"] = shape[1]
         else:
             raise ValueError(
                 "add_qcd_scales: the qcd_scales should be a list!")
 
     def add_shape_nuisance(self, process, cardname, shape, symmetrise=False):
         nuisance = "{:<20} shape".format(cardname)
+        # print("shape[0] : ", shape[0].values(0))
+        # print("shape[1] : ", shape[1].values(0)) 
         if shape[0] is not None and (
-            (shape[0].frequencies[shape[0].frequencies > 0].shape[0]) and
-            (shape[1].frequencies[shape[1].frequencies > 0].shape[0])
+            (shape[0].values(0)[shape[0].values(0) >= 0].shape[0]) and
+            (shape[1].values(0)[shape[1].values(0) >= 0].shape[0])
         ):
-            if shape[0] == shape[1]:
-                shape = (2 * self.nominal_hist - shape[0], shape[1])
             if symmetrise:
-                uncert = np.maximum(np.abs(self.nominal_hist - shape[0]),
-                                    np.abs(self.nominal_hist - shape[1]))
-                h_uncert = physt.histogram1d.Histogram1D(
-                    shape[0].binning, uncert, errors2=np.zeros_like(uncert)
+                uncert = np.maximum(np.abs(self.nominal_hist.values(0) - shape[0].values(0)),
+                                    np.abs(self.nominal_hist.values(0) - shape[1].values(0)))
+                
+                h_uncert_up = bh.Histogram(
+                    bh.axis.Variable(self.nominal_hist.axes[0].edges),
+                ).fill(
+                  self.nominal_hist.axes[0].centers,
+                  weight=self.nominal_hist.values(0) + uncert
                 )
-                shape = (self.nominal_hist - h_uncert,
-                         self.nominal_hist + h_uncert)
-            self.add_nuisance(process, nuisance, 1.0)
-            self.shape_file[process + "_" + cardname +
-                            "Up"] = methods.from_physt(shape[0])
-            self.shape_file[process + "_" + cardname +
-                            "Down"] = methods.from_physt(shape[1])
-            if False:
-                draw_ratio(
-                    self.nominal_hist,
-                    shape[0], shape[1], process + cardname
+                h_uncert_dw = bh.Histogram(
+                    bh.axis.Variable(self.nominal_hist.axes[0].edges),
+                ).fill(
+                  self.nominal_hist.axes[0].centers,
+                  weight=self.nominal_hist.values(0) - uncert
                 )
+                h_uncert_up.name = self.nominal_hist.name
+                h_uncert_up.axes[0].name = self.nominal_hist.name
+                h_uncert_dw.name = self.nominal_hist.name
+                h_uncert_dw.axes[0].name = self.nominal_hist.name
 
+                shape = (h_uncert_dw, h_uncert_up)
+            self.add_nuisance(process, nuisance, 1.0)
+            #print('-- add shape : ',process, cardname, shape[0].name, shape[1].name)
+            self.shape_file[process + "_" + cardname + "Up"] = shape[0]
+            self.shape_file[process + "_" + cardname + "Down"] = shape[1]
+            
     def add_rate_param(self, name, channel, process, vmin=0.1, vmax=10):
         # name rateParam bin process initial_value [min,max]
         template = "{name} rateParam {channel} {process} 1 [{vmin},{vmax}]"
@@ -367,14 +405,15 @@ class datacard:
         self.dc_file.append(rate_line)
         self.dc_file.append("-"*30)
         for nuisance in sorted(self.nuisances.keys()):
-            scale = self.nuisances[nuisance]
-            line_ = "{0:<8}".format(nuisance)
-            for process, _ in self.rates:
-                if process in scale:
-                    line_ += "{0:>15}".format("%.3f" % scale[process])
-                else:
-                    line_ += "{0:>15}".format("-")
-            self.dc_file.append(line_)
+          print(" source --> ", nuisance)
+          scale = self.nuisances[nuisance]
+          line_ = "{0:<8}".format(nuisance)
+          for process, _ in self.rates:
+              if process in scale:
+                  line_ += "{0:>15}".format("%.3f" % scale[process])
+              else:
+                  line_ += "{0:>15}".format("-")
+          self.dc_file.append(line_)
         self.dc_file += self.extras
         with open(self.dc_name, "w") as fout:
             fout.write("\n".join(self.dc_file))
