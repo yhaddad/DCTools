@@ -76,7 +76,7 @@ TOP:
   type:
     background
   color: 124
-  kfactor: 1.0
+  kfactor: 1.8
 data:
   files:
     - ./eos/DoubleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root

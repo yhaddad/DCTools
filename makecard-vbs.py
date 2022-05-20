@@ -28,7 +28,7 @@ def main():
     parser.add_argument("-era", "--era"     , type=str, default="2018")
     parser.add_argument("-f"  , "--force"   , action="store_true")
     parser.add_argument("-ns" , "--nostatuncert", action="store_false")
-    parser.add_argument("--binrange" ,nargs='+', type=int, default=0)
+    parser.add_argument("--binrange" ,nargs='+', type=float, default=0)
     parser.add_argument("--rebin" ,type=int, default=1)
     parser.add_argument("-xs" , "--xsection", type=str, default="")
     parser.add_argument("--onexsec", action="store_true")
@@ -158,28 +158,28 @@ def main():
       if p.name  in ["WW"]:
         if "catEM" in card_name:
           card.add_rate_param("NormWW_" + options.era, "catEM*", p.name)
-        elif "catSR" in card_name:
+        elif "signal" in card_name:
           card.add_rate_param("NormWW_" + options.era, card_name+'*', p.name)
 
       # define rate 3L category
       elif p.name in ["WZ"]:
         if ("cat3L" in card_name):
           card.add_rate_param("NormWZ_" + options.era, "cat3L*", p.name)
-        elif "catSR" in card_name:
+        elif "signal" in card_name:
           card.add_rate_param("NormWZ_" + options.era, card_name+'*', p.name)
 
       # define rate for DY category
       elif p.name in ["DY"]:
         if "DY" in card_name:
           card.add_rate_param("NormDY_" + options.era, "catDY*", p.name)
-        elif "catSR" in card_name:
+        elif "signal" in card_name:
           card.add_rate_param("NormDY_" + options.era, card_name+'*', p.name)
 
       # define rate for TOP category
       elif p.name in ["TOP"]:
         if "TOP" in card_name:
           card.add_rate_param("NormTOP_" + options.era, "catTOP*", p.name)
-        elif "catSR" in card_name:
+        elif "signal" in card_name:
           card.add_rate_param("NormTOP_" + options.era, card_name+'*', p.name) 
       # adding statistical uncertainties
     card.add_auto_stat()
