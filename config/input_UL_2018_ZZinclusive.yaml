@@ -76,7 +76,7 @@ TOP:
   type:
     background
   color: 124
-  kfactor: 1.8
+  kfactor: 1.0
 data:
   files:
     - ./eos/DoubleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
@@ -86,12 +86,12 @@ data:
     - ./eos/EGamma_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
     - ./eos/EGamma_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
     - ./eos/EGamma_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
-    - ./eos/EGamma_Run2018D-UL2018_MiniAODv1_NanoAODv2-v2/merge.root
+    - ./eos/EGamma_Run2018D-UL2018_MiniAODv2_NanoAODv2-v3/merge.root
     - ./eos/MuonEG_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
     - ./eos/MuonEG_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
     - ./eos/MuonEG_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
     - ./eos/MuonEG_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
-    - ./eos/SingleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/SingleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v2/merge.root
     - ./eos/SingleMuon_Run2018B-UL2018_MiniAODv2_NanoAODv9-v2/merge.root
     - ./eos/SingleMuon_Run2018C-UL2018_MiniAODv2_NanoAODv9-v2/merge.root
     - ./eos/SingleMuon_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1/merge.root

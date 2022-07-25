@@ -37,15 +37,19 @@ class datagroup:
             if isinstance(channel, str):
                 histograms = _file.items(
                   filter_classname="TH1*", 
-                  filter_name='*' + observable + "*" + channel + "*"
-                )
+                  filter_name= f"{observable}*{channel}"
+                ) + _file.items(
+                  filter_classname="TH1*", 
+                  filter_name= f"{observable}*{channel}_*"
+                ) 
                 histograms.sort(reverse=True)
                 mergecat = False
             else:
                 raise ValueError("%s DCTools not not accept yet list of channels" % self.name)
             
             # this is temporary
-            histograms = list(filter(lambda hh: '_flat' not in hh[0], histograms))
+            histograms = list(filter(lambda hh: 'flat' not in hh[0].lower(), histograms))
+            print([_i[0] for _i in histograms])
 
 
             if len(histograms) == 0:
@@ -62,15 +66,16 @@ class datagroup:
               name = name.replace(_proc, self.name)
               name = name.replace(";1", "")
               
-              print("before:", name)
               if ptype.lower() == "signal":
                   name = name.replace(self.name, "signal")
               if "catSignal-0jet" in name:
-                  name = name.replace("catSignal-0jet", "cat0Jet")
+                  name = name.replace("catSignal-0jet", "cat0J")
               if "catSignal-1jet" in name:
-                  name = name.replace("catSignal-1jet", "cat1Jet")
-              
-              print("name : ", name)
+                  name = name.replace("catSignal-1jet", "cat1J")
+              if "catSignal-2jet" in name:
+                  name = name.replace("catSignal-2jet", "cat2J")
+
+              print(" ----- >", name)
               #roothist = self.check_shape(roothist)
               ph_hist = roothist.to_boost() * _scale
 
@@ -90,6 +95,7 @@ class datagroup:
                   ]
 
               if name in self.nominal.keys():
+                print(f"     :: adding {name} to nominal")
                 self.nominal[name] = self.nominal[name] + ph_hist
               else:
                 self.nominal[name] = ph_hist
@@ -126,22 +132,20 @@ class datagroup:
         merged_cent = []
         first = True
         # return filtredhist
-        iteration = sorted(
+        hiteration = sorted(
             filtredhist.items(),
             key=lambda pair: self.channel.index(pair[0].split("_")[2])
         )
-        print("how many histos : ", iteration)
-        for name, h in iteration:
-
+        for name, h in hiteration:
             if first:
-                merged_bins = h.numpy_bins
-                merged_cent = h.bin_centers
-                merged_hist = h.frequencies
-                merged_var = h.errors2
+                merged_bins = h.axes[0].edges
+                merged_cent = h.axes[0].centers
+                merged_hist = h.values(0)
+                merged_var = h.variances(0)
                 first = False
             else:
-                new_bins = h.numpy_bins
-                new_bin_cent = h.bin_centers
+                new_bins = h.axes[0].dges
+                new_bin_cent = h.axes[0].centers
 
                 if merged_bins[-1] == new_bins[-1]:
                     new_bins = new_bins + merged_bins[-1] + 10
@@ -159,12 +163,8 @@ class datagroup:
                 merged_var = np.concatenate([merged_var, new_error])
 
         cat = re.search('cat(.*)', name).group().split("_")[0]
-        print("binning : ", merged_bins)
-        print("centers : ", merged_cent)
-        print("histogr : ", merged_hist)
-        print("var     : ", merged_var)
-        physt.binnings.NumpyBinning(merged_cent)
-        physt.binnings.NumpyBinning(merged_bins)
+        # physt.binnings.NumpyBinning(merged_cent)
+        # physt.binnings.NumpyBinning(merged_bins)
         if len(merged_hist):
             new_hist = physt.histogram1d.Histogram1D(
                 bin_centers=physt.binnings.NumpyBinning(merged_cent),
@@ -180,16 +180,14 @@ class datagroup:
 
     def get(self, systvar, merged=True):
         shapeUp, shapeDown = None, None
-        print(" SYS : ", systvar)
+        # print(" SYS : ", systvar)
         for n, hist in self.merged.items():
           if "sys" not in n and systvar == "nom":
             return hist[1]
           elif systvar in n:
             if "Up" in n:
-              # print("---> Up   : ", n)
               shapeUp = hist[1]
             if "Down" in n:
-              # print("---> Down : ", n)
               shapeDown = hist[1]
         if shapeUp is None or shapeDown is None:
           print(f"[WARNING] {systvar} is not found in the input file, please check!")        
@@ -208,7 +206,7 @@ class datagroup:
                 name = name.replace("_sys", "")
                 if "data" in name:
                     name = name.replace("data", "data_obs")
-                fout[name] = uproot_methods.classes.TH1.from_numpy(hist)
+                fout[name] = hist
             fout.close()
 
     def xs_scale(self, ufile, proc):
@@ -224,10 +222,10 @@ class datagroup:
         #print (proc, xsec)
         assert xsec > 0, "{} has a null cross section!".format(proc)
         scale = 1.0
-        try:
-            scale = xsec * self.lumi/ufile["genEventSumw"].to_boost().sum().value
-        except:
-            scale = xsec * self.lumi/ufile["genEventSumw"].to_boost().sum().value
+        #try:
+        scale = xsec * self.lumi/ufile["genEventSumw"].values()
+        # except:
+        #     scale = xsec * self.lumi/ufile["genEventSumw"].values()
         return scale
 
 
@@ -410,7 +408,7 @@ class datacard:
         self.dc_file.append(rate_line)
         self.dc_file.append("-"*30)
         for nuisance in sorted(self.nuisances.keys()):
-          print(" source --> ", nuisance)
+          # print(" source --> ", nuisance)
           scale = self.nuisances[nuisance]
           line_ = "{0:<8}".format(nuisance)
           for process, _ in self.rates:

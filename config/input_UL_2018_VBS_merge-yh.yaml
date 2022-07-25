@@ -1,6 +1,5 @@
 VVV:
   files:
-    - ./eos/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
     - ./eos/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
     - ./eos/WZZ_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
     - ./eos/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
@@ -32,22 +31,26 @@ WW:
     - ./eos/GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
     - ./eos/GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
     - ./eos/GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/VBS_OSWW_LL_TuneCP5_13TeV-madgraph-pythia8/merge.root
+    - ./eos/VBS_OSWW_TT_TuneCP5_13TeV-madgraph-pythia8/merge.root
+    - ./eos/VBS_OSWW_TL_TuneCP5_13TeV-madgraph-pythia8/merge.root
+    - ./eos/VBS_OSWW_LT_TuneCP5_13TeV-madgraph-pythia8/merge.root
   type:
     background
   color: 842
-  kfactor: 1.0
 VBS:
   files:
     - ./eos/ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8/merge.root
   type:
-    signal
+    background
   color: 895
 WZ:
   files:
     - ./eos/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/merge.root
   type:
     background
-  kfactor: 1.0
+  kfactor: 1.23
   color: 856
 DY:
   files:
@@ -59,26 +62,12 @@ DY:
     - ./eos/DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
     - ./eos/DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
     - ./eos/DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
-    #- ./eos/DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-    #- ./eos/DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-    #- ./eos/DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-    # - ./eos/DYJetsToLL_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-    # - ./eos/DYJetsToLL_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-    # - ./eos/DYJetsToLL_Pt-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-    # - ./eos/DYJetsToLL_Pt-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-    # - ./eos/DYJetsToLL_Pt-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
-  type:
-    background
-  kfactor: 1.0
-EWK:
-  files:
+    - ./eos/DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8/merge.root
     - ./eos/EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8/merge.root
-    - ./eos/EWKWMinus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8/merge.root
-    - ./eos/EWKWPlus2Jets_WToLNu_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8/merge.root
-    - ./eos/WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8/merge.root
   type:
     background
   kfactor: 1.0
+  color: 901
 TOP:
   files:
     - ./eos/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/merge.root

@@ -11,37 +11,46 @@
 #  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
 
 
-# python makecard.py --channel signal --variable nnscore \
-#   --rebin=1 --binrange 0 1 \
-#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
-# python3 makecard.py --channel catDY --variable nnscore \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
-# python3 makecard.py --channel cat3L --variable nnscore \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
-# python3 makecard.py --channel catEM --variable nnscore \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
-#  python3 makecard.py --channel cat4L --variable nnscore \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
+python makecard-vbs.py --channel signal --variable nnscore \
+  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+  --xsection=config/xsections_2018-yh.yaml
+python3 makecard-vbs.py --channel catDY --variable nnscore \
+  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+  --xsection=config/xsections_2018-yh.yaml
+python3 makecard-vbs.py --channel cat3L --variable nnscore \
+  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+  --xsection=config/xsections_2018-yh.yaml
+python3 makecard-vbs.py --channel catEM --variable nnscore \
+  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+  --xsection=config/xsections_2018-yh.yaml
+python3 makecard-vbs.py --channel catTOP --variable nnscore \
+  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+  --xsection=config/xsections_2018-yh.yaml
 
 # python makecard.py --channel signal --variable nnscoreFlat \
-#   --rebin=1 --binrange 0 1 \
-#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
+#   --rebin=2 --binrange 0 1 \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
 # python3 makecard.py --channel catDY --variable nnscoreFlat \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
+#   --rebin=3 --binrange 0 1 \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
 # python3 makecard.py --channel cat3L --variable nnscoreFlat \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
+#   --rebin=2 --binrange 0 1 \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
 # python3 makecard.py --channel catEM --variable nnscoreFlat \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
-#  python3 makecard.py --channel cat4L --variable nnscoreFlat \
-#  --rebin=1 --binrange 0 1 \
-#  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
+#   --rebin=2 --binrange 0 1 \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
+# python3 makecard.py --channel cat4L --variable nnscoreFlat \
+#   --rebin=2 --binrange 0 1 \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml \
+#   --xsection=config/xsections_2018.yaml
 
 
 # python makecard.py --channel signal --variable phizmet \
@@ -67,51 +76,65 @@
 # python3 makecard.py --channel cat4L --variable measMET \
 #  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
 
-python makecard.py --channel "catSignal-0jet" --variable measMT \
- --rebin=1 --binrange 0 2000 \
- --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
-python makecard.py --channel "catSignal-1jet" --variable measMT \
- --rebin=1 --binrange 0 2000 \
- --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
-python makecard.py --channel "catSignal-2jet" --variable measMT \
- --rebin=1 --binrange 0 2000 \
- --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
-
-python makecard.py --channel "catSignal-0jetMM" --variable measMT \
- --rebin=1 --binrange 0 2000 \
- --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
+# python makecard.py --channel "catSignal-0jet" --variable measMT \
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+# python makecard.py --channel "catSignal-1jet" --variable measMT \
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+# python makecard.py --channel "catSignal-2jet" --variable measMT \
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
+# python makecard.py --channel "catSignal-0jetMM" --variable measMT \
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
 # python makecard.py --channel "catSignal-1jetMM" --variable measMT \
-#  --rebin=1 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
 # python makecard.py --channel "catSignal-2jetMM" --variable measMT \
-#  --rebin=1 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
-
-#  python makecard.py --channel "catSignal-0jetEE" --variable measMT \
-#  --rebin=1 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
+# python makecard.py --channel "catSignal-0jetEE" --variable measMT \
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
 # python makecard.py --channel "catSignal-1jetEE" --variable measMT \
-#  --rebin=1 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
 # python makecard.py --channel "catSignal-2jetEE" --variable measMT \
-#  --rebin=1 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
-
+#   --rebin=2 --binrange 100 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
 # python3 makecard.py --channel cat3L --variable measMT \
-#  --rebin=2 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
+#   --rebin=2 --binrange 0 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
 # python3 makecard.py --channel catEM --variable measMT \
-#  --rebin=2 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
-# python3 makecard.py --channel cat4L --variable measMT \
-#  --rebin=2 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
+#   --rebin=2 --binrange 0 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
 # python3 makecard.py --channel catDY --variable measMT \
-#  --rebin=2 --binrange 0 2000 \
-#  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
-
-
-
+#   --rebin=1 --binrange 0 100 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
+# python3 makecard.py --channel catTOP --variable measMT \
+#   --rebin=2 --binrange 0 2000 \
+#   --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml \
+#   --xsection=config/xsections_2018.yaml
+#
 # python makecard.py --channel "catSignal-0jet" --variable phizmet \
 #  --stack ZZ2l2nu ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_ZZinclusive.yaml
 # python makecard.py --channel "catSignal-1jet" --variable phizmet \

@@ -120,68 +120,68 @@ def main():
       card.add_nuisance(p.name, "{:<21}  lnN".format("CMS_RES_e"),  1.005)
       card.add_nuisance(p.name, "{:<21}  lnN".format("CMS_RES_m"),  1.005)
       
-      card.add_shape_nuisance(p.name, "CMS_EFF_e", p.get("ElecronSF" ), symmetrise=False)
-      card.add_shape_nuisance(p.name, "CMS_EFF_m", p.get("MuonSF")    , symmetrise=False)
-      
-      card.add_shape_nuisance(p.name, "CMS_JES_{}".format(options.era), p.get("jesTotal") , symmetrise=False)
-      card.add_shape_nuisance(p.name, "CMS_JER_{}".format(options.era), p.get("jer")      , symmetrise=False)
-
-      #card.add_shape_nuisance(name, "CMS_BTag_{}".format(options.era), p.get("btagEventWeight"), symmetrise=False)
-      card.add_shape_nuisance(p.name, "CMS_Trig_{}".format(options.era), p.get("TriggerSFWeight"), symmetrise=False)
-      
-      if options.era in ['2016','2017']:
-        card.add_shape_nuisance(p.name, "CMS_pfire_{}".format(options.era), p.get("PrefireWeight"))
-
-      card.add_shape_nuisance(p.name, "CMS_PU_{}".format(options.era), p.get("puWeight"  ), symmetrise=False)
-      
-      #QCD scale, PDF and other theory uncertainty
-      if 'DY' not in p.name:
-        card.add_qcd_scales(
-          p.name, "CMS_QCDScale{}_{}".format(p.name, options.era), 
-          [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
-        )
-      
-      # PDF uncertaintites
-      if p.name != "TOP":
-        card.add_shape_nuisance(p.name, "PDF", p.get("PDF"), symmetrise=False)  
-      
-      # Underlying events
-      card.add_nuisance(p.name, "{:<21}  lnN".format("UEPS"),  1.020) 
-      
-      # EWK uncertainties
-      if p.name in ["ZZ"]:
-        card.add_shape_nuisance(p.name, "EWKZZ", p.get("EWK"), symmetrise=False)
-      if p.name in ["WZ"]:
-        card.add_shape_nuisance(p.name, "EWKWZ", p.get("EWK"), symmetrise=False)                          
-      
-      # define rates
-      if p.name  in ["WW"]:
-        if "catEM" in card_name:
-          card.add_rate_param("NormWW_" + options.era, "catEM*", p.name)
-        elif "signal" in card_name:
-          card.add_rate_param("NormWW_" + options.era, card_name+'*', p.name)
-
-      # define rate 3L category
-      elif p.name in ["WZ"]:
-        if ("cat3L" in card_name):
-          card.add_rate_param("NormWZ_" + options.era, "cat3L*", p.name)
-        elif "signal" in card_name:
-          card.add_rate_param("NormWZ_" + options.era, card_name+'*', p.name)
-
-      # define rate for DY category
-      elif p.name in ["DY"]:
-        if "DY" in card_name:
-          card.add_rate_param("NormDY_" + options.era, "catDY*", p.name)
-        elif "signal" in card_name:
-          card.add_rate_param("NormDY_" + options.era, card_name+'*', p.name)
-
-      # define rate for TOP category
-      elif p.name in ["TOP"]:
-        if "TOP" in card_name:
-          card.add_rate_param("NormTOP_" + options.era, "catTOP*", p.name)
-        elif "signal" in card_name:
-          card.add_rate_param("NormTOP_" + options.era, card_name+'*', p.name) 
-      # adding statistical uncertainties
+      # card.add_shape_nuisance(p.name, "CMS_EFF_e", p.get("ElecronSF" ), symmetrise=False)
+      # card.add_shape_nuisance(p.name, "CMS_EFF_m", p.get("MuonSF")    , symmetrise=False)
+      # 
+      # card.add_shape_nuisance(p.name, "CMS_JES_{}".format(options.era), p.get("jesTotal") , symmetrise=False)
+      # card.add_shape_nuisance(p.name, "CMS_JER_{}".format(options.era), p.get("jer")      , symmetrise=False)
+      #
+      # #card.add_shape_nuisance(name, "CMS_BTag_{}".format(options.era), p.get("btagEventWeight"), symmetrise=False)
+      # card.add_shape_nuisance(p.name, "CMS_Trig_{}".format(options.era), p.get("TriggerSFWeight"), symmetrise=False)
+      # 
+      # if options.era in ['2016','2017']:
+      #   card.add_shape_nuisance(p.name, "CMS_pfire_{}".format(options.era), p.get("PrefireWeight"))
+      #
+      # card.add_shape_nuisance(p.name, "CMS_PU_{}".format(options.era), p.get("puWeight"  ), symmetrise=False)
+      # 
+      # #QCD scale, PDF and other theory uncertainty
+      # if 'DY' not in p.name:
+      #   card.add_qcd_scales(
+      #     p.name, "CMS_QCDScale{}_{}".format(p.name, options.era), 
+      #     [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
+      #   )
+      # 
+      # # PDF uncertaintites
+      # if p.name != "TOP":
+      #   card.add_shape_nuisance(p.name, "PDF", p.get("PDF"), symmetrise=False)  
+      # 
+      # # Underlying events
+      # card.add_nuisance(p.name, "{:<21}  lnN".format("UEPS"),  1.020) 
+      # 
+      # # EWK uncertainties
+      # if p.name in ["ZZ"]:
+      #   card.add_shape_nuisance(p.name, "EWKZZ", p.get("EWK"), symmetrise=False)
+      # if p.name in ["WZ"]:
+      #   card.add_shape_nuisance(p.name, "EWKWZ", p.get("EWK"), symmetrise=False)                          
+      # 
+      # # define rates
+      # if p.name  in ["WW"]:
+      #   if "catEM" in card_name:
+      #     card.add_rate_param("NormWW_" + options.era, "catEM*", p.name)
+      #   elif "signal" in card_name:
+      #     card.add_rate_param("NormWW_" + options.era, card_name+'*', p.name)
+      #
+      # # define rate 3L category
+      # elif p.name in ["WZ"]:
+      #   if ("cat3L" in card_name):
+      #     card.add_rate_param("NormWZ_" + options.era, "cat3L*", p.name)
+      #   elif "signal" in card_name:
+      #     card.add_rate_param("NormWZ_" + options.era, card_name+'*', p.name)
+      #
+      # # define rate for DY category
+      # elif p.name in ["DY"]:
+      #   if "DY" in card_name:
+      #     card.add_rate_param("NormDY_" + options.era, "catDY*", p.name)
+      #   elif "signal" in card_name:
+      #     card.add_rate_param("NormDY_" + options.era, card_name+'*', p.name)
+      #
+      # # define rate for TOP category
+      # elif p.name in ["TOP"]:
+      #   if "TOP" in card_name:
+      #     card.add_rate_param("NormTOP_" + options.era, "catTOP*", p.name)
+      #   elif "signal" in card_name:
+      #     card.add_rate_param("NormTOP_" + options.era, card_name+'*', p.name) 
+      # # adding statistical uncertainties
     card.add_auto_stat()
     card.dump()
 
