@@ -6,7 +6,6 @@ import argparse
 import dctools
 import numpy as np
 from typing import Any, IO
-from termcolor import colored
 
 
 class config_input:
