@@ -53,7 +53,7 @@ groups:
     processes:
       - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
     type:
-      background
+      signal
     color: 895
   WZ:
     processes:
@@ -61,7 +61,6 @@ groups:
       - WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8
     type:
       background
-    kfactor: 1.00
     color: 856
   DY:
     processes:
@@ -77,7 +76,6 @@ groups:
       - EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8
     type:
       background
-    kfactor: 1.0
     color: 901
   TOP:
     processes:
@@ -95,25 +93,9 @@ groups:
     type:
       background
     color: 124
-    kfactor: 1.0
   data:
     processes:
-      - DoubleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1
-      - DoubleMuon_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1
-      - DoubleMuon_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1
-      - DoubleMuon_Run2018D-UL2018_MiniAODv2_NanoAODv9-v2
-      - EGamma_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1
-      - EGamma_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1
-      - EGamma_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1
-      - EGamma_Run2018D-UL2018_MiniAODv2_NanoAODv9-v3
-      - MuonEG_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1
-      - MuonEG_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1
-      - MuonEG_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1
-      - MuonEG_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1
-      - SingleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v2
-      - SingleMuon_Run2018B-UL2018_MiniAODv2_NanoAODv9-v2
-      - SingleMuon_Run2018C-UL2018_MiniAODv2_NanoAODv9-v2
-      - SingleMuon_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1
+      - Data
     type:
       data
     color: 1

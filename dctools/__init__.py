@@ -5,194 +5,76 @@ import uproot
 import os
 import re
 import boost_histogram as bh
+import hist
 
 __all__ = ['datacard', 'datagroup', "plot"]
 
 
 class datagroup:
-    def __init__(self, files, observable="measMET", name="DY",
-                 channel="", kfactor=1.0, ptype="background",
+    def __init__(self, histograms, observable="MT", name="DY",
+                 channel="catSR_VBS", ptype="background",
                  luminosity=1.0, rebin=1, normalise=True,
                  xsections=None, mergecat=True, binrange=None):
-        self._files = files
-        self.name = name
+        self.histograms = histograms
+        self.name  = name
         self.ptype = ptype
-        self.lumi = luminosity
-        self.xsec = xsections
+        self.lumi  = luminosity
+        self.xsec  = xsections
         self.outfile = None
         self.channel = channel
         self.nominal = {}
         self.systvar = set()
         self.rebin = rebin
-
+        self.observable = observable
         # droping bins the same way as droping elements in numpy arrays a[1:3]
         self.binrange = binrange
 
-        for fn in self._files:
-            _file = uproot.open(fn)
-            if not _file:
-              raise ValueError("%s is not a valid rootfile" % fn)
+        self.stacked = None 
+        for proc, _hist in self.histograms.items():    
+            bh_hist = _hist['hist']
+            _scale = 1 
+            if ptype.lower() != "data": 
+                _scale = self.xs_scale(
+                    sumw=_hist['sumw'], 
+                    proc=proc
+                )
+                bh_hist = bh_hist * _scale
 
-            histograms = None
-            if isinstance(channel, str):
-                histograms = _file.items(
-                  filter_classname="TH1*", 
-                  filter_name= f"{observable}*{channel}"
-                ) + _file.items(
-                  filter_classname="TH1*", 
-                  filter_name= f"{observable}*{channel}_*"
-                ) 
-                histograms.sort(reverse=True)
-                mergecat = False
-            else:
-                raise ValueError("%s DCTools not not accept yet list of channels" % self.name)
+            # To use more elegant slicing switch to Hist
+            bh_hist = hist.Hist(bh_hist)
             
-            # this is temporary
-            histograms = list(filter(lambda hh: 'flat' not in hh[0].lower(), histograms))
-            print([_i[0] for _i in histograms])
+            print(proc, ": ", _hist['sumw'], _scale)
+            # skip empty catgeories
+            if self.channel not in bh_hist.axes['channel']:
+                continue
 
-
-            if len(histograms) == 0:
-              raise ValueError(f"ERROR: there is no histogram found in {fn}")
+            # Select one channel
+            bh_hist = bh_hist[{
+                "channel" : self.channel,
+            }]
+            
+            if self.stacked is None:
+                self.stacked = bh_hist
             else:
-              _proc = re.search(f"{observable}_(.+?)_{channel}", histograms[0][0]).group(1)
-
-            _scale = 1
-            if ptype.lower() != "data":
-                _scale = self.xs_scale(ufile=_file, proc=_proc)
-                _scale *= kfactor
-
-            for name, roothist in histograms:
-              name = name.replace(_proc, self.name)
-              name = name.replace(";1", "")
-              
-              if ptype.lower() == "signal":
-                  name = name.replace(self.name, "signal")
-              if "catSignal-0jet" in name:
-                  name = name.replace("catSignal-0jet", "cat0J")
-              if "catSignal-1jet" in name:
-                  name = name.replace("catSignal-1jet", "cat1J")
-              if "catSignal-2jet" in name:
-                  name = name.replace("catSignal-2jet", "cat2J")
-
-              print(" ----- >", name)
-              #roothist = self.check_shape(roothist)
-              ph_hist = roothist.to_boost() * _scale
-
-              ph_hist.name = name
-              ph_hist.axes[0].name = observable
-              ph_hist.title = name
-              
-              # rebin / re-range
-              if not isinstance(self.binrange, list):
-                  self.binrange = [
-                      ph_hist.axes[0].edges[ 0], 
-                      ph_hist.axes[0].edges[-1]]
-
-              if isinstance(self.binrange, list) or self.rebin >= 1:
-                  ph_hist = ph_hist[
-                      bh.loc(self.binrange[0]):bh.loc(self.binrange[1]):bh.rebin(self.rebin)
-                  ]
-
-              if name in self.nominal.keys():
-                print(f"     :: adding {name} to nominal")
-                self.nominal[name] = self.nominal[name] + ph_hist
-              else:
-                self.nominal[name] = ph_hist
-
-              try:
-                self.systvar.add(re.search("sys_[\w.]+", name).group())
-              except:
-                pass
-
-        if mergecat:
-          # merging the nominal
-          self.merged = {}
-          for syst in self.systvar:
-            m_hist = self.merge_cat(self.nominal, lambda elem: syst in elem[0])
-            self.merged[m_hist[0]] = m_hist
-          m_hist = self.merge_cat(self.nominal, lambda elem: "sys" not in elem[0])
-          self.merged[m_hist[0]] = m_hist
-        else:
-          self.merged = {i: (i, c) for i, c in self.nominal.items()}
-
-    def check_shape(self, histogram):
-        for ibin in range(histogram.numbins+1):
-            if histogram[ibin] < 0:
-                histogram[ibin] = 0
-        return histogram
-
-    def merge_cat(self, hitograms, callback):
-        filtredhist = dict()
-        for (key, value) in hitograms.items():
-            if callback((key, value)):
-                filtredhist[key] = value
-        merged_hist = []
-        merged_bins = []
-        merged_cent = []
-        first = True
-        # return filtredhist
-        hiteration = sorted(
-            filtredhist.items(),
-            key=lambda pair: self.channel.index(pair[0].split("_")[2])
-        )
-        for name, h in hiteration:
-            if first:
-                merged_bins = h.axes[0].edges
-                merged_cent = h.axes[0].centers
-                merged_hist = h.values(0)
-                merged_var = h.variances(0)
-                first = False
-            else:
-                new_bins = h.axes[0].dges
-                new_bin_cent = h.axes[0].centers
-
-                if merged_bins[-1] == new_bins[-1]:
-                    new_bins = new_bins + merged_bins[-1] + 10
-                else:
-                    new_bins = new_bins + merged_bins[-1]
-
-                merged_bins = np.concatenate([merged_bins, new_bins])
-                merged_cent = np.array(
-                    [0.5*(merged_bins[i+1] + merged_bins[i]) for i in range(merged_bins.shape[0]-1)])
-                new_frequencies = h.frequencies
-                new_frequencies = [0.0, *new_frequencies]
-                merged_hist = np.concatenate([merged_hist, new_frequencies])
-                new_error = h.errors2
-                new_error = [0.0, *new_error]
-                merged_var = np.concatenate([merged_var, new_error])
-
-        cat = re.search('cat(.*)', name).group().split("_")[0]
-        # physt.binnings.NumpyBinning(merged_cent)
-        # physt.binnings.NumpyBinning(merged_bins)
-        if len(merged_hist):
-            new_hist = physt.histogram1d.Histogram1D(
-                bin_centers=physt.binnings.NumpyBinning(merged_cent),
-                #bin_centers= merged_cent,
-                frequencies=merged_hist,
-                binning=physt.binnings.NumpyBinning(merged_bins),
-                errors2=merged_var
-            )
-
-            return name.replace("_" + cat, ""), new_hist
-        else:
-            return
+                self.stacked += bh_hist
+            
 
     def get(self, systvar, merged=True):
         shapeUp, shapeDown = None, None
-        # print(" SYS : ", systvar)
-        for n, hist in self.merged.items():
-          if "sys" not in n and systvar == "nom":
-            return hist[1]
-          elif systvar in n:
-            if "Up" in n:
-              shapeUp = hist[1]
-            if "Down" in n:
-              shapeDown = hist[1]
-        if shapeUp is None or shapeDown is None:
-          print(f"[WARNING] {systvar} is not found in the input file, please check!")        
-        return (shapeUp, shapeDown)
-
+        if "nominal" in systvar:
+            return self.stacked[{'systematic': systvar}].project(self.observable)
+        else:
+            try:
+                shapeUp = self.stacked[
+                    {'systematic': systvar + 'Up'}
+                ].project(self.observable)
+                shapeDown = self.stacked[
+                    {'systematic': systvar + 'Down'}
+                ].project(self.observable)
+                return (shapeUp, shapeDown)
+            except ValueError:
+                print(f'{systvar} is not present in the boost histogram')
+                
     def save(self, filename=None, working_dir="fitroom", force=True):
         if not filename:
             filename = "histograms-" + self.name + ".root"
@@ -209,23 +91,21 @@ class datagroup:
                 fout[name] = hist
             fout.close()
 
-    def xs_scale(self, ufile, proc):
+    def xs_scale(self, sumw, proc):
         xsec = 1.0
         if self.xsec is not None:
-            xsec  = self.xsec[proc].get("xsec", 1.0)
-            xsec *= self.xsec[proc].get("kr", 1.0)
-            xsec *= self.xsec[proc].get("br", 1.0)
+            xsec  = self.xsec[proc].xsec
+            xsec *= self.xsec[proc].kr
+            xsec *= self.xsec[proc].br
         else:
             print("[WARNING] cross-section file is empty ... ")
             
-        xsec *= 1000.0
-        #print (proc, xsec)
+        # to get to femtobarn
+        xsec *= 1000.0 
         assert xsec > 0, "{} has a null cross section!".format(proc)
+        assert sumw > 0, "{} sum of weights is null!".format(proc)
         scale = 1.0
-        #try:
-        scale = xsec * self.lumi/ufile["genEventSumw"].values()
-        # except:
-        #     scale = xsec * self.lumi/ufile["genEventSumw"].values()
+        scale = xsec * self.lumi/sumw
         return scale
 
 
@@ -246,7 +126,7 @@ class datacard:
         self.nuisances = {}
         self.extras = set()
         self.dc_name = "cards-{}/shapes-{}.dat".format(name, channel)
-        # print("dc_name: ", self.dc_name, " --> ", name, channel)
+        
         if not os.path.isdir(os.path.dirname(self.dc_name)):
             os.mkdir(os.path.dirname(self.dc_name))
 
@@ -271,9 +151,9 @@ class datacard:
             self.nuisances[name] = {}
         self.nuisances[name][process] = value
 
-    def add_nominal(self, process, shape):
+    def add_nominal(self, process, shape, type):
         value = shape.sum().value
-        self.rates.append((process, value))
+        self.rates.append((process, value, type))
         self.shape_file[process] = shape
         self.nominal_hist = shape
 
@@ -393,15 +273,26 @@ class datacard:
             self.dc_file.append(line)
         self.dc_file.append("-"*30)
         # bin lines
-        bins_line = "{0:<8}".format("bin")
-        proc_line = "{0:<8}".format("process")
-        indx_line = "{0:<8}".format("process")
-        rate_line = "{0:<8}".format("rate")
-        for i, tup in enumerate(self.rates):
+        bins_line = "{0:<10}".format("bin")
+        proc_line = "{0:<10}".format("process")
+        indx_line = "{0:<10}".format("process")
+        rate_line = "{0:<10}".format("rate")
+
+        i_signal = 0
+        i_backgr = 1 
+        for tup in self.rates:
             bins_line += "{0:>15}".format(self.channel)
             proc_line += "{0:>15}".format(tup[0])
-            indx_line += "{0:>15}".format(i - self.nsignal + 1)
+            if 'signal' in tup[2]:
+                indx_line += "{0:>15}".format(i_signal)
+            else:
+                indx_line += "{0:>15}".format(i_backgr)
             rate_line += "{0:>15}".format("%.3f" % tup[1])
+            if 'signal' in tup[2]:
+                i_signal -= 1
+            else:
+                i_backgr += 1
+
         self.dc_file.append(bins_line)
         self.dc_file.append(proc_line)
         self.dc_file.append(indx_line)
@@ -410,8 +301,8 @@ class datacard:
         for nuisance in sorted(self.nuisances.keys()):
           # print(" source --> ", nuisance)
           scale = self.nuisances[nuisance]
-          line_ = "{0:<8}".format(nuisance)
-          for process, _ in self.rates:
+          line_ = "{0:<10}".format(nuisance)
+          for process, _, _ in self.rates:
               if process in scale:
                   line_ += "{0:>15}".format("%.3f" % scale[process])
               else:
