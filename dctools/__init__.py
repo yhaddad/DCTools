@@ -35,14 +35,15 @@ class datagroup:
             _scale = 1 
             if ptype.lower() != "data": 
                 _scale = self.xs_scale(
-                    sumw=_hist['sumw'].sum(), 
+                    sumw=_hist['sumw'], 
                     proc=proc
                 )
                 bh_hist = bh_hist * _scale
 
             # To use more elegant slicing switch to Hist
             bh_hist = hist.Hist(bh_hist)
-
+            
+            print(proc, ": ", _hist['sumw'], _scale)
             # skip empty catgeories
             if self.channel not in bh_hist.axes['channel']:
                 continue
@@ -125,7 +126,7 @@ class datacard:
         self.nuisances = {}
         self.extras = set()
         self.dc_name = "cards-{}/shapes-{}.dat".format(name, channel)
-        # print("dc_name: ", self.dc_name, " --> ", name, channel)
+        
         if not os.path.isdir(os.path.dirname(self.dc_name)):
             os.mkdir(os.path.dirname(self.dc_name))
 
@@ -150,9 +151,9 @@ class datacard:
             self.nuisances[name] = {}
         self.nuisances[name][process] = value
 
-    def add_nominal(self, process, shape):
+    def add_nominal(self, process, shape, type):
         value = shape.sum().value
-        self.rates.append((process, value))
+        self.rates.append((process, value, type))
         self.shape_file[process] = shape
         self.nominal_hist = shape
 
@@ -272,15 +273,26 @@ class datacard:
             self.dc_file.append(line)
         self.dc_file.append("-"*30)
         # bin lines
-        bins_line = "{0:<8}".format("bin")
-        proc_line = "{0:<8}".format("process")
-        indx_line = "{0:<8}".format("process")
-        rate_line = "{0:<8}".format("rate")
-        for i, tup in enumerate(self.rates):
+        bins_line = "{0:<10}".format("bin")
+        proc_line = "{0:<10}".format("process")
+        indx_line = "{0:<10}".format("process")
+        rate_line = "{0:<10}".format("rate")
+
+        i_signal = 0
+        i_backgr = 1 
+        for tup in self.rates:
             bins_line += "{0:>15}".format(self.channel)
             proc_line += "{0:>15}".format(tup[0])
-            indx_line += "{0:>15}".format(i - self.nsignal + 1)
+            if 'signal' in tup[2]:
+                indx_line += "{0:>15}".format(i_signal)
+            else:
+                indx_line += "{0:>15}".format(i_backgr)
             rate_line += "{0:>15}".format("%.3f" % tup[1])
+            if 'signal' in tup[2]:
+                i_signal -= 1
+            else:
+                i_backgr += 1
+
         self.dc_file.append(bins_line)
         self.dc_file.append(proc_line)
         self.dc_file.append(indx_line)
@@ -289,8 +301,8 @@ class datacard:
         for nuisance in sorted(self.nuisances.keys()):
           # print(" source --> ", nuisance)
           scale = self.nuisances[nuisance]
-          line_ = "{0:<8}".format(nuisance)
-          for process, _ in self.rates:
+          line_ = "{0:<10}".format(nuisance)
+          for process, _, _ in self.rates:
               if process in scale:
                   line_ += "{0:>15}".format("%.3f" % scale[process])
               else:

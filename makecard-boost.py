@@ -92,9 +92,7 @@ def main():
     nsignals = 0
     signal = ""
 
-    print(boosthist.keys())
     for name in config.groups:
-        print(" --- >> ", name)
         histograms = dict(
             filter(
                 lambda _n: _n[0] in config.groups[name].processes,
@@ -125,13 +123,13 @@ def main():
     card.shapes_headers()
 
     data_obs = datasets.get("data").get("nominal")
-    
+    card.add_observation(data_obs)
+
     for n, p in datasets.items():
         if p.ptype=="data":
             continue 
 
-        card.add_nominal(p.name, p.get("nominal"))
-        print("nominal vlaues : ", p.get("nominal").values(0))
+        card.add_nominal(p.name, p.get("nominal"), p.ptype)
 
         card.add_nuisance(p.name, "{:<21}  lnN".format("CMS_lumi_{}".format(options.era)),config.luminosity.uncer)
         card.add_nuisance(p.name, "{:<21}  lnN".format("CMS_RES_e"),  1.005)
