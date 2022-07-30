@@ -6,6 +6,8 @@ __pycache__/
 # Specific to DCTools
 cards-*
 *.root
+*.gz 
+*.pkl
 
 # C extensions
 *.so
