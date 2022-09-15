@@ -8,6 +8,9 @@ cards-*
 *.root
 *.gz 
 *.pkl
+*.pdf
+*.png
+cards-*
 
 # C extensions
 *.so
