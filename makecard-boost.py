@@ -4,7 +4,9 @@ import gzip
 import pickle
 import argparse
 import dctools
-import numpy as np
+import hist
+import matplotlib.pyplot as plt
+from dctools import plot as plotter
 from typing import Any, IO
 
 
@@ -57,13 +59,25 @@ def construct_include(loader: config_loader, node: yaml.Node) -> Any:
 yaml.add_constructor('!include', construct_include, config_loader)
 
 
+
+
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
-    parser.add_argument("-i"  , "--input"   , type=str, default="./config/input_UL_2018_VBS_boost.yaml")
-    parser.add_argument("-v"  , "--variable", type=str, default="nnscore")
-    parser.add_argument("-y"  , "--era"     , type=str, default='2018')
+    parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018_VBS_boost.yaml")
+    parser.add_argument("-v"  , "--variable", type=str , default="nnscore")
+    parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-c"  , "--channel" , nargs='+', type=str)
     parser.add_argument("-s"  , "--signal"  , nargs='+', type=str)
+    parser.add_argument('-n'  , "--name"    , type=str , default='')
+    parser.add_argument('-p'  , "--plot"    , action="store_true")
+    parser.add_argument('--rebin', type=int, default=0, help='rebin')
+    parser.add_argument("--bins", 
+            type=lambda s: [float(item) for item in s.split(',')], 
+            help='input a comma separated list. ex: --bins="-1.2,0,1.2"'
+    )
+    parser.add_argument('--blind', action='store_true', help='blinding the channel')
+    parser.add_argument('--checksyst', action='store_true')
+
     options = parser.parse_args()
     
     config = None
@@ -86,10 +100,13 @@ def main():
 
     if len(options.channel) == 1:
         options.channel = options.channel[0]
+    
     # make datasets per prcess
     datasets = {}
-    nsignals = 0
     signal = ""
+
+    if options.name=='':
+        options.name == options.channel
 
     for name in config.groups:
         histograms = dict(
@@ -106,15 +123,47 @@ def main():
             name       = name,
             xsections  = config.xsections,
             channel    = options.channel,
-            luminosity = config.luminosity.value
+            luminosity = config.luminosity.value,
+            rebin      = options.rebin,
         )
 
         #p.save()
         datasets[p.name] = p
         if p.ptype == "signal":
             signal = p.name
-    
-    card_name = options.channel+options.era
+   
+    if options.plot:
+        _plot_channel = plotter.add_process_axis(datasets)
+        pred = _plot_channel.project('process','systematic', options.variable)[:hist.loc('data'),:,:]
+        data = _plot_channel[{'systematic':'nominal'}].project('process',options.variable)[hist.loc('data'),:] 
+
+        plt.figure(figsize=(6,7))
+        ax, bx = plotter.mcplot(
+            pred[{'systematic':'nominal'}].stack('process'),
+            data=None if options.blind else data, 
+            syst=pred.stack('process'),
+        )
+
+        ax.set_yscale('log')
+        bx.set_ylim([0.1, 1.9])
+        plt.savefig(f'plot-{options.channel}-{options.variable}-{options.era}.pdf')
+
+    if options.checksyst:        
+        _plot_channel = plotter.add_process_axis(datasets)
+        pred = _plot_channel.project('process','systematic', options.variable)[:hist.loc('data'),:,:]
+        data = _plot_channel[{'systematic':'nominal'}].project('process',options.variable)[hist.loc('data'),:] 
+        plotter.check_systematic(
+            pred[{'systematic':'nominal'}].stack('process'),
+            syst=pred.stack('process'),
+            plot_file_name=f'check-sys-{options.channel}-{options.era}'
+        )
+
+
+    card_name = 'noname'
+    if options.name == '':
+        card_name = options.channel+options.era
+    else:
+        card_name = options.name+options.era
     card = dctools.datacard(
         name = signal,
         channel= card_name
@@ -126,26 +175,27 @@ def main():
 
     for n, p in datasets.items():
         if p.ptype=="data":
-            continue 
+            continue
 
         card.add_nominal(p.name, p.get("nominal"), p.ptype)
 
-        card.add_nuisance(p.name, "{:<21}  lnN".format("CMS_lumi_{}".format(options.era)),config.luminosity.uncer)
-        card.add_nuisance(p.name, "{:<21}  lnN".format("CMS_RES_e"),  1.005)
-        card.add_nuisance(p.name, "{:<21}  lnN".format("CMS_RES_m"),  1.005) 
-        card.add_nuisance(p.name, "{:<21}  lnN".format("UEPS")     ,  1.020)
+        card.add_log_normal(p.name, "CMS_lumi_{}".format(options.era), config.luminosity.uncer)
+        # card.add_log_normal(p.name, "CMS_res_e",  1.005)
+        # card.add_log_normal(p.name, "CMS_RES_m",  1.005) 
+        card.add_log_normal(p.name, "UEPS"     ,  1.020)
 
-        card.add_shape_nuisance(p.name, "CMS_RES_e", p.get("ElectronEn" ), symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_EFF_e", p.get("ElecronSF" ), symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_RES_m", p.get("MuonEn")    , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_EFF_m", p.get("MuonSF")    , symmetrise=False)
 
-        card.add_shape_nuisance(p.name, "CMS_JES_{}".format(options.era), p.get("jesTotal")  , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_JER_{}".format(options.era), p.get("jer")       , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_BTag_{}".format(options.era), p.get("BTagSF")   , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_Trig_{}".format(options.era), p.get("TriggerSF"), symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_res_e", p.get("ElectronEn"), symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_eff_e", p.get("ElecronSF" ), symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_res_m", p.get("MuonEn")    , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_eff_m", p.get("MuonSF")    , symmetrise=False)
+
+        card.add_shape_nuisance(p.name, "CMS_jes_{}".format(options.era ), p.get("jesTotal")  , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_jer_{}".format(options.era ), p.get("jer")       , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_btag_{}".format(options.era), p.get("BTagSF")   , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_trig_{}".format(options.era), p.get("TriggerSF"), symmetrise=False)
      
-        card.add_shape_nuisance(p.name, "CMS_PU_{}".format(options.era), p.get("puWeight"  ), symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_pileup_{}".format(options.era), p.get("puWeight"  ), symmetrise=False)
        
         #QCD scale, PDF and other theory uncertainty
         if 'DY' not in p.name:
@@ -154,9 +204,9 @@ def main():
                     [p.get("QCDScale0"), p.get("QCDScale1"), p.get("QCDScale2")]
         )
         
-        # PDF uncertaintites
-        if p.name != "TOP":
-            card.add_shape_nuisance(p.name, "PDF", p.get("PDF"), symmetrise=False)
+        # PDF uncertaintites / not working for the moment
+        # if p.name != "TOP":
+        # card.add_shape_nuisance(p.name, "pdf", p.get("PDF"), symmetrise=False)
 
         # EWK uncertainties
         if p.name in ["ZZ"]:

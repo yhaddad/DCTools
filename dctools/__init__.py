@@ -1,9 +1,8 @@
 from __future__ import division
 
 import numpy as np
-import uproot
 import os
-import re
+import uproot
 import boost_histogram as bh
 import hist
 
@@ -12,9 +11,8 @@ __all__ = ['datacard', 'datagroup', "plot"]
 
 class datagroup:
     def __init__(self, histograms, observable="MT", name="DY",
-                 channel="catSR_VBS", ptype="background",
-                 luminosity=1.0, rebin=1, normalise=True,
-                 xsections=None, mergecat=True, binrange=None):
+                 channel="catSR_VBS", ptype="background", 
+                 luminosity=1.0, rebin=1, xsections=None, binrange=None):
         self.histograms = histograms
         self.name  = name
         self.ptype = ptype
@@ -43,7 +41,6 @@ class datagroup:
             # To use more elegant slicing switch to Hist
             bh_hist = hist.Hist(bh_hist)
             
-            print(proc, ": ", _hist['sumw'], _scale)
             # skip empty catgeories
             if self.channel not in bh_hist.axes['channel']:
                 continue
@@ -51,15 +48,21 @@ class datagroup:
             # Select one channel
             bh_hist = bh_hist[{
                 "channel" : self.channel,
+                self.observable : hist.rebin(self.rebin)
             }]
             
+            
+
             if self.stacked is None:
                 self.stacked = bh_hist
             else:
                 self.stacked += bh_hist
             
+    def merge_categories(self):
+        pass
 
-    def get(self, systvar, merged=True):
+
+    def get(self, systvar):
         shapeUp, shapeDown = None, None
         if "nominal" in systvar:
             return self.stacked[{'systematic': systvar}].project(self.observable)
@@ -74,22 +77,9 @@ class datagroup:
                 return (shapeUp, shapeDown)
             except ValueError:
                 print(f'{systvar} is not present in the boost histogram')
-                
-    def save(self, filename=None, working_dir="fitroom", force=True):
-        if not filename:
-            filename = "histograms-" + self.name + ".root"
-            if "signal" in self.ptype:
-                filename = filename.replace(self.name, "signal")
-                self.name = self.name.replace(self.name, "signal")
-        self.outfile = working_dir + "/" + filename
-        if os.path.isdir(self.outfile) or force:
-            fout = uproot.recreate(self.outfile, compression=uproot.ZLIB(4))
-            for name, hist in self.merged.items():
-                name = name.replace("_sys", "")
-                if "data" in name:
-                    name = name.replace("data", "data_obs")
-                fout[name] = hist
-            fout.close()
+  
+    def to_boost(self):
+        return self.stacked#.project('systematic', self.observable)
 
     def xs_scale(self, sumw, proc):
         xsec = 1.0
@@ -151,6 +141,12 @@ class datacard:
             self.nuisances[name] = {}
         self.nuisances[name][process] = value
 
+    def add_log_normal(self, process, name, value): 
+        nuisance = "{:<32} lnN".format(name)
+        if name not in self.nuisances:
+            self.nuisances[nuisance] = {}
+        self.nuisances[nuisance][process] = value
+
     def add_nominal(self, process, shape, type):
         value = shape.sum().value
         self.rates.append((process, value, type))
@@ -158,7 +154,7 @@ class datacard:
         self.nominal_hist = shape
 
     def add_qcd_scales(self, process, cardname, qcd_scales):
-        nuisance = "{:<20} shape".format(cardname)
+        nuisance = "{:<30} shape".format(cardname)
         if isinstance(qcd_scales, list):
             shapes = []
             for sh in qcd_scales:
@@ -212,7 +208,7 @@ class datacard:
                 "add_qcd_scales: the qcd_scales should be a list!")
 
     def add_shape_nuisance(self, process, cardname, shape, symmetrise=False):
-        nuisance = "{:<20} shape".format(cardname)
+        nuisance = "{:<30} shape".format(cardname)
         # print("shape[0] : ", shape[0].values(0))
         # print("shape[1] : ", shape[1].values(0)) 
         if shape[0] is not None and (
@@ -273,10 +269,10 @@ class datacard:
             self.dc_file.append(line)
         self.dc_file.append("-"*30)
         # bin lines
-        bins_line = "{0:<10}".format("bin")
-        proc_line = "{0:<10}".format("process")
-        indx_line = "{0:<10}".format("process")
-        rate_line = "{0:<10}".format("rate")
+        bins_line = "{0:<36}".format("bin")
+        proc_line = "{0:<36}".format("process")
+        indx_line = "{0:<36}".format("process")
+        rate_line = "{0:<36}".format("rate")
 
         i_signal = 0
         i_backgr = 1 

@@ -1,5 +1,5 @@
 boosthist:
-  - ./data/histogram-zz2l2nu-ristretto.pkl.gz
+  - ./data/histogram-vbs-zz-2018.pkl.gz
 
 xsections:
   !include ./config/xsections_2018.yaml
@@ -9,28 +9,6 @@ luminosity:
   uncer: 1.025
 
 groups:
-  VVV:
-    processes:
-      - WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8
-      - WZZ_TuneCP5_13TeV-amcatnlo-pythia8
-      - ZZZ_TuneCP5_13TeV-amcatnlo-pythia8
-    type:
-      background
-    color: 38
-  ZZ:
-    processes:
-      - ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
-      - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
-    type:
-      background
-    color: 798
   WW:
     processes:
       - WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
@@ -48,20 +26,12 @@ groups:
       - VBS_OSWW_LT_TuneCP5_13TeV-madgraph-pythia8
     type:
       background
-    color: 842
-  VBS:
-    processes:
-      - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
-    type:
-      signal
-    color: 895
   WZ:
     processes:
       - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8
     type:
       background
-    color: 856
   DY:
     processes:
       - DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos
@@ -76,7 +46,6 @@ groups:
       - EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8
     type:
       background
-    color: 901
   TOP:
     processes:
       - ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
@@ -92,10 +61,48 @@ groups:
       - TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8
     type:
       background
-    color: 124
+  VVV:
+    processes:
+      - WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8
+      - WZZ_TuneCP5_13TeV-amcatnlo-pythia8
+      - ZZZ_TuneCP5_13TeV-amcatnlo-pythia8
+    type:
+      background
+  VBS_qcd:
+    processes:
+      - ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
+      - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
+    type:
+      signal
+  VBS_ewk:
+    processes:
+      - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
+    type:
+      signal
   data:
     processes:
-      - Data
+      - SingleMuon_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1
+      - SingleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v2
+      - SingleMuon_Run2018B-UL2018_MiniAODv2_NanoAODv9-v2
+      - SingleMuon_Run2018C-UL2018_MiniAODv2_NanoAODv9-v2
+      - MuonEG_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1
+      - MuonEG_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1
+      - MuonEG_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1
+      - MuonEG_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1
+      - EGamma_Run2018D-UL2018_MiniAODv2_NanoAODv9-v3
+      - EGamma_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1
+      - EGamma_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1
+      - EGamma_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1
+      - DoubleMuon_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1
+      - DoubleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1
+      - DoubleMuon_Run2018D-UL2018_MiniAODv2_NanoAODv9-v2
+      - DoubleMuon_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1
     type:
       data
-    color: 1

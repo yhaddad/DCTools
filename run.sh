@@ -1,4 +1,15 @@
 #!/bin/sh
+
+python makecard-boost.py --channel catSR_MjjBin0 --name=sr_0bin --plot --checksyst --rebin=2 --blind
+python makecard-boost.py --channel catSR_MjjBin1 --name=sr_1bin --plot --checksyst --rebin=2 --blind
+python makecard-boost.py --channel catSR_MjjBin2 --name=sr_2bin --plot --checksyst --rebin=2 --blind
+python makecard-boost.py --channel catSR_VBS --plot --checksyst --rebin=2
+python makecard-boost.py --channel catDY_VBS --plot --checksyst --rebin=2
+python makecard-boost.py --channel catEM_VBS --plot --checksyst --rebin=4
+python makecard-boost.py --channel cat3L_VBS --plot --checksyst --rebin=4
+python makecard-boost.py --channel catNR_VBS --plot --checksyst --rebin=4
+python makecard-boost.py --channel catTT_VBS --plot --checksyst --rebin=4
+
 # python makecard.py --channel signal --variable dijet_Mjj \
 #   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
 # python3 makecard.py --channel catDY --variable dijet_Mjj \
@@ -11,21 +22,21 @@
 #  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
 
 
-python makecard-vbs.py --channel signal --variable nnscore \
-  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
-  --xsection=config/xsections_2018-yh.yaml
-python3 makecard-vbs.py --channel catDY --variable nnscore \
-  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
-  --xsection=config/xsections_2018-yh.yaml
-python3 makecard-vbs.py --channel cat3L --variable nnscore \
-  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
-  --xsection=config/xsections_2018-yh.yaml
-python3 makecard-vbs.py --channel catEM --variable nnscore \
-  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
-  --xsection=config/xsections_2018-yh.yaml
-python3 makecard-vbs.py --channel catTOP --variable nnscore \
-  --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
-  --xsection=config/xsections_2018-yh.yaml
+# python makecard-vbs.py --channel signal --variable nnscore \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+#   --xsection=config/xsections_2018-yh.yaml
+# python3 makecard-vbs.py --channel catDY --variable nnscore \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+#   --xsection=config/xsections_2018-yh.yaml
+# python3 makecard-vbs.py --channel cat3L --variable nnscore \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+#   --xsection=config/xsections_2018-yh.yaml
+# python3 makecard-vbs.py --channel catEM --variable nnscore \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+#   --xsection=config/xsections_2018-yh.yaml
+# python3 makecard-vbs.py --channel catTOP --variable nnscore \
+#   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_merge-yh.yaml \
+#   --xsection=config/xsections_2018-yh.yaml
 
 # python makecard.py --channel signal --variable nnscoreFlat \
 #   --rebin=2 --binrange 0 1 \
