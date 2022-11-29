@@ -63,14 +63,14 @@ yaml.add_constructor('!include', construct_include, config_loader)
 
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
-    parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018_VBS_boost.yaml")
+    parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018-algiers.yaml")
     parser.add_argument("-v"  , "--variable", type=str , default="nnscore")
     parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-c"  , "--channel" , nargs='+', type=str)
     parser.add_argument("-s"  , "--signal"  , nargs='+', type=str)
     parser.add_argument('-n'  , "--name"    , type=str , default='')
     parser.add_argument('-p'  , "--plot"    , action="store_true")
-    parser.add_argument('--rebin', type=int, default=0, help='rebin')
+    parser.add_argument('--rebin', type=int, default=1, help='rebin')
     parser.add_argument("--bins", 
             type=lambda s: [float(item) for item in s.split(',')], 
             help='input a comma separated list. ex: --bins="-1.2,0,1.2"'
@@ -108,6 +108,9 @@ def main():
     if options.name=='':
         options.name == options.channel
 
+    if isinstance(list(boosthist.values())[0]["hist"], dict):
+        boosthist = {k: {"hist": v["hist"][options.variable], "sumw":v["sumw"]}for k, v in boosthist.items()}
+        
     for name in config.groups:
         histograms = dict(
             filter(
@@ -115,7 +118,7 @@ def main():
                 boosthist.items()
             )
         )
-        
+
         p = dctools.datagroup(
             histograms = histograms,
             ptype      = config.groups[name].type,
@@ -148,6 +151,7 @@ def main():
         bx.set_ylim([0.1, 1.9])
         plt.savefig(f'plot-{options.channel}-{options.variable}-{options.era}.pdf')
 
+
     if options.checksyst:        
         _plot_channel = plotter.add_process_axis(datasets)
         pred = _plot_channel.project('process','systematic', options.variable)[:hist.loc('data'),:,:]
@@ -157,7 +161,6 @@ def main():
             syst=pred.stack('process'),
             plot_file_name=f'check-sys-{options.channel}-{options.era}'
         )
-
 
     card_name = 'noname'
     if options.name == '':
@@ -179,40 +182,55 @@ def main():
 
         card.add_nominal(p.name, p.get("nominal"), p.ptype)
 
-        card.add_log_normal(p.name, "CMS_lumi_{}".format(options.era), config.luminosity.uncer)
+        card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
         # card.add_log_normal(p.name, "CMS_res_e",  1.005)
         # card.add_log_normal(p.name, "CMS_RES_m",  1.005) 
-        card.add_log_normal(p.name, "UEPS"     ,  1.020)
+        # card.add_log_normal(p.name, "UEPS"     ,  1.020)
 
 
-        card.add_shape_nuisance(p.name, "CMS_res_e", p.get("ElectronEn"), symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_eff_e", p.get("ElecronSF" ), symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_res_m", p.get("MuonEn")    , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_eff_m", p.get("MuonSF")    , symmetrise=False)
+        #card.add_shape_nuisance(p.name, "CMS_res_e", p.get("ElectronEn"), symmetrise=False)
+        #card.add_shape_nuisance(p.name, "CMS_eff_e", p.get("ElecronSF" ), symmetrise=False)
+        #card.add_shape_nuisance(p.name, "CMS_res_m", p.get("MuonEn")    , symmetrise=False)
+        #card.add_shape_nuisance(p.name, "CMS_eff_m", p.get("MuonSF")    , symmetrise=False)
 
-        card.add_shape_nuisance(p.name, "CMS_jes_{}".format(options.era ), p.get("jesTotal")  , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_jer_{}".format(options.era ), p.get("jer")       , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_btag_{}".format(options.era), p.get("BTagSF")   , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_trig_{}".format(options.era), p.get("TriggerSF"), symmetrise=False)
-     
-        card.add_shape_nuisance(p.name, "CMS_pileup_{}".format(options.era), p.get("puWeight"  ), symmetrise=False)
+        # JES/JES and UEPS
+        card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False) 
+        card.add_shape_nuisance(p.name, f"CMS_jer_{options.era}", p.get("JER"), symmetrise=False)
+        card.add_shape_nuisance(p.name, f"CMS_UES_{options.era}", p.get("UES"), symmetrise=False)
+        
+        # Can maybe ne correlated over era's? 
+        card.add_shape_nuisance(p.name, f"CMS_UEPS_FRS_{options.era}", p.get("UEPS_FSR"), symmetrise=False)
+        card.add_shape_nuisance(p.name, f"CMS_UEPS_ISR_{options.era}", p.get("UEPS_ISR"), symmetrise=False)
+        
+
+        # b-tagging uncertainties
+        card.add_shape_nuisance(p.name, f"CMS_btag_sf_bc_{options.era}" , p.get(f"btag_sf_bc_{options.era}")   , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"CMS_btag_sf_uds_{options.era}", p.get(f"btag_sf_light_{options.era}"), symmetrise=False)
+
+        # b-tagging uncertainties correlated over years
+        card.add_shape_nuisance(p.name, "CMS_btag_sf_bc"  , p.get("btag_sf_bc_correlated")   , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_btag_sf_uds" , p.get("btag_sf_light_correlated"), symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_btag_df_stat", p.get("btag_sf_stat")            , symmetrise=False)
+
+        # other uncertainties
+        card.add_shape_nuisance(p.name, f"CMS_pileup_{options.era}", p.get("pileup_weight"), symmetrise=False)
        
         #QCD scale, PDF and other theory uncertainty
         if 'DY' not in p.name:
             card.add_qcd_scales(
                     p.name, "CMS_QCDScale{}_{}".format(p.name, options.era), 
-                    [p.get("QCDScale0"), p.get("QCDScale1"), p.get("QCDScale2")]
+                    [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
         )
         
         # PDF uncertaintites / not working for the moment
-        # if p.name != "TOP":
-        # card.add_shape_nuisance(p.name, "pdf", p.get("PDF"), symmetrise=False)
+        card.add_shape_nuisance(p.name, "PDF"   , p.get("PDF_weight")  , symmetrise=False)
+        card.add_shape_nuisance(p.name, "AlphaS", p.get("PDFaS_weight"), symmetrise=False)
 
         # EWK uncertainties
-        if p.name in ["ZZ"]:
-            card.add_shape_nuisance(p.name, "EWKZZ", p.get("EWK"), symmetrise=False)
-        if p.name in ["WZ"]:
-            card.add_shape_nuisance(p.name, "EWKWZ", p.get("EWK"), symmetrise=False)                          
+        #if p.name in ["ZZ"]:
+        #    card.add_shape_nuisance(p.name, "EWKZZ", p.get("EWK"), symmetrise=False)
+        #if p.name in ["WZ"]:
+        #    card.add_shape_nuisance(p.name, "EWKWZ", p.get("EWK"), symmetrise=False)                          
         # define rates
         if p.name  in ["WW"]:
             if "catEM" in card_name:

@@ -28,7 +28,7 @@ class datagroup:
         self.binrange = binrange
 
         self.stacked = None 
-        for proc, _hist in self.histograms.items():    
+        for proc, _hist in self.histograms.items():
             bh_hist = _hist['hist']
             _scale = 1 
             if ptype.lower() != "data": 
@@ -51,8 +51,6 @@ class datagroup:
                 self.observable : hist.rebin(self.rebin)
             }]
             
-            
-
             if self.stacked is None:
                 self.stacked = bh_hist
             else:

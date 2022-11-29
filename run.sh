@@ -1,14 +1,25 @@
 #!/bin/sh
 
-python makecard-boost.py --channel catSR_MjjBin0 --name=sr_0bin --plot --checksyst --rebin=2 --blind
-python makecard-boost.py --channel catSR_MjjBin1 --name=sr_1bin --plot --checksyst --rebin=2 --blind
-python makecard-boost.py --channel catSR_MjjBin2 --name=sr_2bin --plot --checksyst --rebin=2 --blind
-python makecard-boost.py --channel catSR_VBS --plot --checksyst --rebin=2
-python makecard-boost.py --channel catDY_VBS --plot --checksyst --rebin=2
-python makecard-boost.py --channel catEM_VBS --plot --checksyst --rebin=4
-python makecard-boost.py --channel cat3L_VBS --plot --checksyst --rebin=4
-python makecard-boost.py --channel catNR_VBS --plot --checksyst --rebin=4
-python makecard-boost.py --channel catTT_VBS --plot --checksyst --rebin=4
+# python makecard-boost.py --variable gnn_score --channel  catSR_VBS --name=SR  --checksyst --rebin=2 --blind --plot
+# python makecard-boost.py --variable gnn_score --channel  catDY_VBS --name=cr_dy  --checksyst --rebin=2 --plot
+# python makecard-boost.py --variable gnn_score --channel  catEM_VBS --name=cr_em  --checksyst --rebin=2 --plot
+# python makecard-boost.py --variable gnn_score --channel  cat3L_VBS --name=cr_3l  --checksyst --rebin=2 --plot
+# python makecard-boost.py --variable gnn_score --channel  catTT_VBS --name=cr_tt  --checksyst --rebin=2 --plot
+
+python makecard-boost.py --variable dilep_mt --channel catSR --checksyst --plot
+python makecard-boost.py --variable dilep_mt --channel catDY --checksyst --plot
+python makecard-boost.py --variable dilep_mt --channel cat3L --checksyst --plot
+python makecard-boost.py --variable dilep_mt --channel catEM --checksyst --plot
+python makecard-boost.py --variable dilep_mt --channel catTT --checksyst --plot
+python makecard-boost.py --variable dilep_mt --channel catNR --checksyst --plot
+
+# python makecard-boost.py --variable gnn_score --channel  catSR_MjjBin2 --name=sr_2bin  --checksyst --rebin=2 --blind
+# python makecard-boost.py --variable gnn_score --channel  catSR_VBS  --checksyst --rebin=2
+# python makecard-boost.py --variable gnn_score --channel  catDY_VBS  --checksyst --rebin=2
+# python makecard-boost.py --variable gnn_score --channel  catEM_VBS  --checksyst --rebin=4
+# python makecard-boost.py --variable gnn_score --channel  cat3L_VBS  --checksyst --rebin=4
+# python makecard-boost.py --variable gnn_score --channel  catNR_VBS  --checksyst --rebin=4
+# python makecard-boost.py --variable gnn_score --channel  catTT_VBS  --checksyst --rebin=4
 
 # python makecard.py --channel signal --variable dijet_Mjj \
 #   --stack VBS ZZ WZ WW VVV TOP DY data --input=config/input_UL_2018_VBS_with_signal_1.yaml
