@@ -1,5 +1,6 @@
 import yaml
 import os
+import json
 import gzip
 import pickle
 import argparse
@@ -58,9 +59,6 @@ def construct_include(loader: config_loader, node: yaml.Node) -> Any:
 
 yaml.add_constructor('!include', construct_include, config_loader)
 
-
-
-
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
     parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018-algiers.yaml")
@@ -110,7 +108,7 @@ def main():
 
     if isinstance(list(boosthist.values())[0]["hist"], dict):
         boosthist = {k: {"hist": v["hist"][options.variable], "sumw":v["sumw"]}for k, v in boosthist.items()}
-        
+    
     for name in config.groups:
         histograms = dict(
             filter(
@@ -176,7 +174,7 @@ def main():
     data_obs = datasets.get("data").get("nominal")
     card.add_observation(data_obs)
 
-    for n, p in datasets.items():
+    for _, p in datasets.items():
         if p.ptype=="data":
             continue
 
@@ -186,12 +184,11 @@ def main():
         # card.add_log_normal(p.name, "CMS_res_e",  1.005)
         # card.add_log_normal(p.name, "CMS_RES_m",  1.005) 
         # card.add_log_normal(p.name, "UEPS"     ,  1.020)
-
-
-        #card.add_shape_nuisance(p.name, "CMS_res_e", p.get("ElectronEn"), symmetrise=False)
-        #card.add_shape_nuisance(p.name, "CMS_eff_e", p.get("ElecronSF" ), symmetrise=False)
-        #card.add_shape_nuisance(p.name, "CMS_res_m", p.get("MuonEn")    , symmetrise=False)
-        #card.add_shape_nuisance(p.name, "CMS_eff_m", p.get("MuonSF")    , symmetrise=False)
+        
+        card.add_shape_nuisance(p.name, "CMS_res_e", p.get("ElectronEn") , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_roch" , p.get("MuonRoc")    , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_lept_sf", p.get("LeptonSF") , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_trig_sf", p.get("triggerSF"), symmetrise=False)
 
         # JES/JES and UEPS
         card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False) 
@@ -224,8 +221,9 @@ def main():
         
         # PDF uncertaintites / not working for the moment
         card.add_shape_nuisance(p.name, "PDF"   , p.get("PDF_weight")  , symmetrise=False)
-        card.add_shape_nuisance(p.name, "AlphaS", p.get("PDFaS_weight"), symmetrise=False)
-
+        card.add_shape_nuisance(p.name, "AlphaS", p.get("aS_weight")   , symmetrise=False)        
+        card.add_shape_nuisance(p.name, "PDFaS" , p.get("PDFaS_weight"), symmetrise=False)
+        
         # EWK uncertainties
         #if p.name in ["ZZ"]:
         #    card.add_shape_nuisance(p.name, "EWKZZ", p.get("EWK"), symmetrise=False)
@@ -237,12 +235,14 @@ def main():
                 card.add_rate_param("NormWW_" + options.era, "catEM*", p.name)
             elif "SR" in card_name:
                 card.add_rate_param("NormWW_" + options.era, card_name+'*', p.name)
+        
         # define rate 3L categoryel 
         elif p.name in ["WZ"]:
             if "cat3L" in card_name:
                 card.add_rate_param("NormWZ_" + options.era, "cat3L*", p.name)
             elif "SR" in card_name:
                 card.add_rate_param("NormWZ_" + options.era, card_name+'*', p.name)
+        
         # define rate for DY category
         elif p.name in ["DY"]:
             if "DY" in card_name:

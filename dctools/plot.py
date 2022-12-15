@@ -1,20 +1,20 @@
 from __future__ import division
 
 import hist
-import io
 import os 
 import numpy as np
 import matplotlib as mlp
 import matplotlib.pyplot as plt
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List
 from hist.intervals import ratio_uncertainty
 from . import datagroup
 from cycler import cycler
 
 
 _plot_colors_ = [
-    '#99B6F7','#46B3A5','#F6D68D',
-    '#2E6D92','#580C82','#8E31A1',
+    '#99B6F7','#46B3A5',
+    '#F6D68D','#2E6D92',
+    '#580C82','#8E31A1',
     '#FE4773',
 ]
 
@@ -110,7 +110,8 @@ def mcplot(
     l_edge = None
     r_edge = None
     pred_values = None
-    
+   
+    ax.set_title(kwargs.get('title', ''))
     if isinstance(pred, hist.Stack):
         pred_hstk = pred
         pred_ksum = sum(pred)
@@ -129,7 +130,7 @@ def mcplot(
         pass
         
     pred_hstk.plot(ax=ax, stack=True, histtype="fill")
-    pred_stat_error = np.sqrt(pred_ksum.values(0))
+    pred_stat_error = np.sqrt(np.abs(pred_ksum.values(0)))
     
     ax.bar( 
         x_vals, 
@@ -151,17 +152,17 @@ def mcplot(
     ratio_uncert = np.zeros_like(pred_values)
     
     bx.bar( 
-        x_vals, 
-        height = 2*pred_stat_error/pred_values,
-        width  = (r_edge - l_edge) / len(x_vals),
-        bottom = 1 - pred_stat_error/pred_values,
-        color  = "red",
-        alpha  = 0.4,
+           x_vals, 
+           height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0), 
+           width  = (r_edge - l_edge) / len(x_vals),
+           bottom = 1 - np.divide(pred_stat_error,pred_values, where=pred_values!=0),
+           color  = "red",
+           alpha  = 0.4,
     )
     
     if data is not None:
         data.plot(ax=ax, color='black', histtype='errorbar')
-        ratio = data.values(0)/pred_values
+        ratio = np.divide(data.values(0), pred_values, where=pred_values!=0)
         ratio_uncert = ratio_uncertainty(
             num=data.values(0),
             denom=pred_values,
@@ -181,7 +182,6 @@ def mcplot(
         ])
         syst_up = []
         syst_dw = []
-        print(len(syst_list))
         for s in syst_list:
             if 'nominal'==s: continue
             if 'PDF' in s: continue
@@ -199,17 +199,14 @@ def mcplot(
         syst_uncert_dw = np.sqrt(np.sum(syst_dw**2, axis=0) + (pred_stat_error/2)**2)
         
         bx.bar( 
-            x_vals, 
-            height = (syst_uncert_up + syst_uncert_dw)/pred_values,
-            width  = (r_edge - l_edge) / len(x_vals),
-            bottom = 1 - syst_uncert_dw/pred_values,
-            color  = "blue",
-            alpha  = 0.2,
-            zorder = 0
-        ) 
+               x_vals, 
+               height = np.divide(syst_uncert_up + syst_uncert_dw, pred_values, where=pred_values!=0),
+               width  = (r_edge - l_edge) / len(x_vals),
+               bottom = 1 - np.divide(syst_uncert_dw, pred_values, where=pred_values!=0),
+               color  = "blue", alpha  = 0.2, zorder = 0
+        )
     
     if isinstance(pred, hist.Hist):
-        print("input is a Hist")
         if proc_axis_name in pred.axes.name:
             pred.stack(proc_axis_name).plot(
                 ax=ax, stack=True, histtype="fill"
@@ -253,7 +250,6 @@ def check_systematic(
         syst_list = set([
             i.replace('Up','').replace('Down','') for i in syst.axes[syst_axis_name]
         ])
-        print(len(syst_list))
         for s in syst_list:
             if 'nominal'==s: continue
             # if 'PDF'==s: continue

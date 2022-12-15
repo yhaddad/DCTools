@@ -4,32 +4,127 @@ import numpy as np
 import os
 import uproot
 import boost_histogram as bh
+#import plot
 import hist
+import yaml
+import json
+import gzip
+import pickle
+from typing import Any, Set, List, Dict, Tuple, IO
 
 __all__ = ['datacard', 'datagroup', "plot"]
 
+class config_input:
+    def __init__(self, cfg:Dict):
+        self._cfg = cfg 
+    
+    def __getitem__(self, key:str)->Any:
+        v = self._cfg[key]
+        if isinstance(v, dict):
+            return config_input(v)
+    
+    def __setitem__(self, key:str, value:Any)->None:
+        self._cfg[key] = value
+
+    def __getattr__(self, k:str) -> Any:
+        try:
+            v = self._cfg[k]
+            if isinstance(v, dict):
+                return config_input(v)
+            return v
+        except AttributeError:
+            pass
+            
+    def __iter__(self):
+        return iter(self._cfg)
+    
+class config_loader(yaml.SafeLoader):
+    """YAML Loader with `!include` constructor."""
+    def __init__(self, stream: IO) -> None:
+        """Initialise Loader."""
+        try:
+            self._root = os.path.split(stream.name)[0]
+        except AttributeError:
+            self._root = os.path.curdir
+        super().__init__(stream)
+
+def construct_include(loader: config_loader, node: yaml.Node) -> Any:
+    """Include file referenced at node."""
+    filename = os.path.abspath(
+        os.path.join(loader._root, loader.construct_scalar(node))
+    )
+    extension = os.path.splitext(filename)[1].lstrip('.')
+
+    with open(filename, 'r') as f:
+        if extension in ('yaml', 'yml'):
+            return yaml.load(f, config_loader)
+        elif extension in ('json', ):
+            return json.load(f)
+        else:
+            return ''.join(f.readlines())
+
+yaml.add_constructor('!include', construct_include, config_loader)
+
+def read_config(file: str):
+    with open(file) as f:
+        try:
+            config = config_input(
+                yaml.load(f.read(), config_loader)
+            )
+            boosthist:Dict = {}
+            for fname in config.boosthist:
+                if '.gz' in fname:
+                    with gzip.open(fname, "rb") as fn_:
+                        boosthist.update(pickle.load(fn_))
+                else:
+                    with open(fname, 'rb') as fn_:
+                        boosthist.update(pickle.load(fn_))
+            config.boosthist = boosthist 
+            return config
+        except yaml.YAMLError as exc:
+            print (exc)
 
 class datagroup:
-    def __init__(self, histograms, observable="MT", name="DY",
-                 channel="catSR_VBS", ptype="background", 
-                 luminosity=1.0, rebin=1, xsections=None, binrange=None):
+    def __init__(self, histograms, observable:str="MT", name:str="DY",
+                 channel:str="catSR_VBS", ptype:str="background", 
+                 luminosity:float=1.0, rebin:int=1, 
+                 xsections:Dict={}, binrange:List=[]):
+
         self.histograms = histograms
         self.name  = name
         self.ptype = ptype
         self.lumi  = luminosity
         self.xsec  = xsections
-        self.outfile = None
+        self.outfile: str = ""
         self.channel = channel
-        self.nominal = {}
-        self.systvar = set()
+        self.nominal: Dict = {}
+        self.systvar = Set
         self.rebin = rebin
         self.observable = observable
         # droping bins the same way as droping elements in numpy arrays a[1:3]
         self.binrange = binrange
 
-        self.stacked = None 
+        self.stacked:hist.Hist = hist.Hist() 
+        if isinstance(list(self.histograms.values())[0]["hist"], dict):
+            self.histograms = {
+                    k: {
+                        "hist": v["hist"][self.observable], 
+                        "sumw":v["sumw"]
+                    } for k, v in self.histograms.items()
+            }
+
         for proc, _hist in self.histograms.items():
-            bh_hist = _hist['hist']
+            # skip empty catgeories
+            if self.channel not in _hist['hist'].axes['channel']:
+                #print(f'[WARNING] : {self.name}: {self.observable}: {self.channel} not present in axes. available channels:')
+                #print(list(_hist['hist'].axes['channel']))
+                continue
+            
+            bh_hist:hist.Hist = _hist['hist'][{
+                "channel" : self.channel,
+                self.observable : hist.rebin(self.rebin)
+            }]
+
             _scale = 1 
             if ptype.lower() != "data": 
                 _scale = self.xs_scale(
@@ -39,30 +134,28 @@ class datagroup:
                 bh_hist = bh_hist * _scale
 
             # To use more elegant slicing switch to Hist
-            bh_hist = hist.Hist(bh_hist)
+            # bh_hist = hist.Hist(bh_hist)
             
-            # skip empty catgeories
-            if self.channel not in bh_hist.axes['channel']:
-                continue
-
+                        
             # Select one channel
-            bh_hist = bh_hist[{
-                "channel" : self.channel,
-                self.observable : hist.rebin(self.rebin)
-            }]
+            # bh_hist = bh_hist[{
+            #     "channel" : self.channel,
+            #     self.observable : hist.rebin(self.rebin)
+            # }]
             
-            if self.stacked is None:
-                self.stacked = bh_hist
-            else:
+            if self.stacked.ndim:
                 self.stacked += bh_hist
+            else:
+                self.stacked = bh_hist
             
     def merge_categories(self):
         pass
 
 
-    def get(self, systvar):
+    def get(self, systvar) -> hist.Hist:
         shapeUp, shapeDown = None, None
         if "nominal" in systvar:
+            #print("get() : ", type(self.stacked))
             return self.stacked[{'systematic': systvar}].project(self.observable)
         else:
             try:
@@ -75,9 +168,10 @@ class datagroup:
                 return (shapeUp, shapeDown)
             except ValueError:
                 print(f'{systvar} is not present in the boost histogram')
+                return hist.Hist()
   
-    def to_boost(self):
-        return self.stacked#.project('systematic', self.observable)
+    def to_boost(self) -> hist.Hist:
+        return self.stacked
 
     def xs_scale(self, sumw, proc):
         xsec = 1.0
@@ -90,8 +184,8 @@ class datagroup:
             
         # to get to femtobarn
         xsec *= 1000.0 
-        assert xsec > 0, "{} has a null cross section!".format(proc)
-        assert sumw > 0, "{} sum of weights is null!".format(proc)
+        assert xsec > 0, f"{proc} has a null cross section!"
+        assert sumw > 0, f"{proc} sum of weights is null!"
         scale = 1.0
         scale = xsec * self.lumi/sumw
         return scale
@@ -174,11 +268,11 @@ class datacard:
 
                 uncert = np.maximum(uncert_up, uncert_dw)
 
-                uncert_r = np.divide(
-                    uncert, self.nominal_hist.values(0),
-                    out=np.zeros_like(uncert)*-1,
-                    where=self.nominal_hist.values(0) != 0
-                )
+                # uncert_r = np.divide(
+                #     uncert, self.nominal_hist.values(0),
+                #     out=np.zeros_like(uncert)*-1,
+                #     where=self.nominal_hist.values(0) != 0
+                # )
                 shapes.append(uncert)
             shapes = np.array(shapes)
             uncert = shapes.max(axis=0)
