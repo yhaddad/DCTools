@@ -50,12 +50,13 @@ def add_process_axis(
     storage = None
     histos = {}
     for it, (n, p) in enumerate(histograms.items()):
-        # if p.ptype != 'data':
-        histos[n] = p.to_boost()
+        _h = p.to_boost()
+        if len(_h.shape) == 0:
+            continue
+        histos[n] = _h
         if it == 0:
             axes = [axis for axis in p.to_boost().axes]
             storage = p.to_boost()._storage_type()
-        
             
     iterator = histos.keys()
     new_axis = hist.axis.StrCategory(iterator, name=axis_name, label=axis_name)
@@ -128,7 +129,11 @@ def mcplot(
         r_edge = pred.axes.edges[-1][-1]
     if isinstance(pred, List):
         pass
+    
+    if "colors" in kwargs:
+        ax.update({"prop_cycle":cycler(color=kwargs["colors"])})
         
+    
     pred_hstk.plot(ax=ax, stack=True, histtype="fill")
     pred_stat_error = np.sqrt(np.abs(pred_ksum.values(0)))
     
@@ -187,6 +192,18 @@ def mcplot(
             if 'PDF' in s: continue
             syst_uncert_up = sum([_hs[{syst_axis_name : s + 'Up'  }] for _hs in syst]).values(0)
             syst_uncert_dw = sum([_hs[{syst_axis_name : s + 'Down'}] for _hs in syst]).values(0)
+            
+            syst_uncert_dw = np.where(
+                np.divide(np.abs(syst_uncert_dw - pred_values), pred_values, where=pred_values!=0)>10,
+                pred_values - np.abs(syst_uncert_up - pred_values), 
+                syst_uncert_dw
+            )
+            syst_uncert_up = np.where(
+                np.divide(np.abs(syst_uncert_up - pred_values), pred_values, where=pred_values!=0)>10,
+                pred_values - np.abs(syst_uncert_dw - pred_values), 
+                syst_uncert_up
+            )
+            
             syst_uncert_up[np.isnan(syst_uncert_up)] = 0
             syst_uncert_dw[np.isnan(syst_uncert_dw)] = 0
             syst_up.append((pred_values-syst_uncert_up))
@@ -195,8 +212,8 @@ def mcplot(
         syst_up = np.array(syst_up)
         syst_dw = np.array(syst_dw)
         
-        syst_uncert_up = np.sqrt(np.sum(syst_up**2, axis=0) + (pred_stat_error/2)**2) 
-        syst_uncert_dw = np.sqrt(np.sum(syst_dw**2, axis=0) + (pred_stat_error/2)**2)
+        syst_uncert_up = np.sqrt(np.sum(np.power(syst_up,2), axis=0))# + np.power(pred_stat_error,2))
+        syst_uncert_dw = np.sqrt(np.sum(np.power(syst_dw,2), axis=0))# + np.power(pred_stat_error,2))
         
         bx.bar( 
                x_vals, 
@@ -205,6 +222,12 @@ def mcplot(
                bottom = 1 - np.divide(syst_uncert_dw, pred_values, where=pred_values!=0),
                color  = "blue", alpha  = 0.2, zorder = 0
         )
+    
+    # print("pred_stat_error : ", np.round(pred_stat_error, 3))
+    # print("pred_values     : ", np.round(pred_values    , 3))
+    # print("pred_stat_error : ", np.round(pred_stat_error, 3))
+    # print("syst_uncert_dw  : ", np.round(syst_uncert_dw , 3))
+    # print("syst_uncert_up  : ", np.round(syst_uncert_up , 3))
     
     if isinstance(pred, hist.Hist):
         if proc_axis_name in pred.axes.name:
@@ -215,7 +238,6 @@ def mcplot(
         data.plot(ax=ax, color='black', histtype='errorbar')
     
     ax.set_xlim(l_edge, r_edge)
-    # bx.set_ylim([0,2])
     ax.legend(ncol=2, loc='upper right')
     bx.set_xlabel(pred_ksum.axes[0].label)
     bx.set_ylabel('data/mc')

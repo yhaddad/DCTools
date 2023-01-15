@@ -33,7 +33,7 @@ class config_input:
                 return config_input(v)
             return v
         except AttributeError:
-            pass
+            return None
             
     def __iter__(self):
         return iter(self._cfg)
@@ -155,7 +155,7 @@ class datagroup:
     def get(self, systvar) -> hist.Hist:
         shapeUp, shapeDown = None, None
         if "nominal" in systvar:
-            #print("get() : ", type(self.stacked))
+            #print("get() : ", type(self.stacked), self.stacked)
             return self.stacked[{'systematic': systvar}].project(self.observable)
         else:
             try:
@@ -301,12 +301,66 @@ class datacard:
 
     def add_shape_nuisance(self, process, cardname, shape, symmetrise=False):
         nuisance = "{:<30} shape".format(cardname)
-        # print("shape[0] : ", shape[0].values(0))
-        # print("shape[1] : ", shape[1].values(0)) 
+        
         if shape[0] is not None and (
             (shape[0].values(0)[shape[0].values(0) >= 0].shape[0]) and
             (shape[1].values(0)[shape[1].values(0) >= 0].shape[0])
         ):
+            var_up = np.where(
+                np.divide(
+                    np.abs(shape[0].values(0) - self.nominal_hist.values(0)), 
+                    self.nominal_hist.values(0), 
+                    where=self.nominal_hist.values(0)!=0
+                )>10,
+                self.nominal_hist.values(0) - np.abs(shape[1].values(0) - self.nominal_hist.values(0)), 
+                shape[0].values(0)
+            )
+            
+            var_dw = np.where(
+                np.divide(
+                    np.abs(shape[1].values(0) - self.nominal_hist.values(0)), 
+                    self.nominal_hist.values(0), 
+                    where=self.nominal_hist.values(0)!=0
+                )>10,
+                self.nominal_hist.values(0) - np.abs(shape[0].values(0) - self.nominal_hist.values(0)), 
+                shape[1].values(0)
+            )
+            
+            # removing bogus normalisations
+            var_up = np.where(
+                shape[0].values(0) < 0, 
+                np.where(
+                    self.nominal_hist.values(0) < 0,  
+                    np.zeros_like(shape[0].values(0)), 
+                    self.nominal_hist.values(0)
+                ),
+                shape[0].values(0)
+            )
+            
+            var_up = np.where(
+                shape[1].values(0) < 0, 
+                np.where(
+                    self.nominal_hist.values(0) < 0,  
+                    np.zeros_like(shape[1].values(0)), 
+                    self.nominal_hist.values(0)
+                ),
+                shape[1].values(0)
+            )
+            
+            h_uncert_up = bh.Histogram(
+                bh.axis.Variable(self.nominal_hist.axes[0].edges),
+            ).fill(
+              self.nominal_hist.axes[0].centers,
+              weight=var_up
+            )
+            h_uncert_dw = bh.Histogram(
+                bh.axis.Variable(self.nominal_hist.axes[0].edges),
+            ).fill(
+              self.nominal_hist.axes[0].centers,
+              weight=var_dw
+            )
+            
+            shape = (h_uncert_dw, h_uncert_up)
             if symmetrise:
                 uncert = np.maximum(np.abs(self.nominal_hist.values(0) - shape[0].values(0)),
                                     np.abs(self.nominal_hist.values(0) - shape[1].values(0)))
@@ -329,10 +383,10 @@ class datacard:
                 h_uncert_dw.axes[0].name = self.nominal_hist.name
 
                 shape = (h_uncert_dw, h_uncert_up)
+                
             self.add_nuisance(process, nuisance, 1.0)
-            #print('-- add shape : ',process, cardname, shape[0].name, shape[1].name)
-            self.shape_file[process + "_" + cardname + "Up"] = shape[0]
-            self.shape_file[process + "_" + cardname + "Down"] = shape[1]
+            self.shape_file[process + "_" + cardname + "Up"] = shape[1]
+            self.shape_file[process + "_" + cardname + "Down"] = shape[0]
             
     def add_rate_param(self, name, channel, process, vmin=0.1, vmax=10):
         # name rateParam bin process initial_value [min,max]

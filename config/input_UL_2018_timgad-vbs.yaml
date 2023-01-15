@@ -35,10 +35,6 @@ groups:
   DY:
     processes:
       - DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos
-      # - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8

@@ -1,0 +1,280 @@
+boosthist:
+  - ./data/merged-histogram-rome-2016.pkl.gz
+
+xsections:
+  !include ./config/xsections_2018.yaml
+
+luminosity: 
+  value: 16.5
+  uncer: 1.025
+
+groups:
+  WW:
+    processes:
+      - WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
+      - GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8
+      - VBS_OSWW_LL_TuneCP5_13TeV-madgraph-pythia8
+      - VBS_OSWW_TT_TuneCP5_13TeV-madgraph-pythia8
+      - VBS_OSWW_TL_TuneCP5_13TeV-madgraph-pythia8
+      - VBS_OSWW_LT_TuneCP5_13TeV-madgraph-pythia8
+    type:
+      background
+    color:
+      "#99B6F7"
+  WZ:
+    processes:
+      - WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - WZJJ_EWK_InclusivePolarization_TuneCP5_13TeV_madgraph-madspin-pythia8
+    type:
+      background
+    color:
+      "#46B3A5"
+  DY:
+    processes:
+      - DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos
+      # - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+      - EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8
+    type:
+      background
+    color:
+      "#F6D68D"
+  TOP:
+    processes:
+      - ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/.root
+      - ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8
+      - tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8
+      - TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
+      - TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
+      - TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
+      - TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8
+      - TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8
+    type:
+      background
+    color:
+      "#2E6D92"
+  VVV:
+    processes:
+      - WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8
+      - WZZ_TuneCP5_13TeV-amcatnlo-pythia8
+      - ZZZ_TuneCP5_13TeV-amcatnlo-pythia8
+      - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
+    type:
+      background
+    color:
+      "#580C82"
+  ZZ2l2nu:
+    processes:
+      - ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
+      - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
+    type:
+      signal
+    color:
+      "#8E31A1"
+  VBSZZ2l2nu:
+    processes:
+      - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
+    type:
+      signal
+    color:
+      "#FE4773"
+  data:
+    processes:
+      - MuonEG
+      - DoubleMuon
+      - SingleMuon
+      - DoubleEG
+      - SingleMuon
+    type:
+      data
+    color:
+      "#181926"
+
+plotting:
+    vbs-DY:
+        dilep_mt:
+            rebin: 2
+            range: [0, 300]
+            blind: false
+        dilep_pt:
+            rebin: 2 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 1 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        njets:
+            rebin: 1
+            range: [2, 5]
+            blind: false
+        gnn_score:
+            rebin: 2
+            range: [0, 1]
+            blind: false
+    vbs-3L:
+        dilep_mt:
+            rebin: 4
+            range: [0, 600]
+            blind: false
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
+        gnn_score:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+    vbs-EM:
+        dilep_mt:
+            rebin: 4
+            range: [0, 600]
+            blind: false
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
+        gnn_score:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+    vbs-TT:
+        dilep_mt:
+            rebin: 4
+            range: [0, 600]
+            blind: false
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
+        gnn_score:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+    vbs-NR:
+        dilep_mt:
+            rebin: 4
+            range: [0, 600]
+            blind: false
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
+        gnn_score:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+    vbs-SR:
+        dilep_mt:
+            rebin: 4
+            range: [0, 600]
+            blind: true
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: true
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: true
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: true
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: true
+        gnn_score:
+            rebin: 2
+            range: [0, 1]
+            blind: true
+        gnn_flat:
+            rebin: 2
+            range: [0, 1]
+            blind: true
