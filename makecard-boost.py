@@ -9,7 +9,7 @@ import hist
 import matplotlib.pyplot as plt
 from dctools import plot as plotter
 from typing import Any, IO
-
+import numpy as np
 
 class config_input:
     def __init__(self, cfg):
@@ -61,7 +61,7 @@ yaml.add_constructor('!include', construct_include, config_loader)
 
 def main():
     parser = argparse.ArgumentParser(description='The Creator of Combinators')
-    parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018-algiers.yaml")
+    parser.add_argument("-i"  , "--input"   , type=str , default="./config/input_UL_2018_timgad-vbs.yaml")
     parser.add_argument("-v"  , "--variable", type=str , default="nnscore")
     parser.add_argument("-y"  , "--era"     , type=str , default='2018')
     parser.add_argument("-c"  , "--channel" , nargs='+', type=str)
@@ -77,25 +77,10 @@ def main():
     parser.add_argument('--checksyst', action='store_true')
 
     options = parser.parse_args()
+    config = dctools.read_config(options.input)
+
+    print(f'making: {options.channel} : {options.variable} : {options.era}')
     
-    config = None
-    with open(options.input) as f:
-        try:
-            config = config_input(
-                yaml.load(f.read(), config_loader)
-            )
-        except yaml.YAMLError as exc:
-            print (exc)
-
-    boosthist = {}
-    for fname in config.boosthist:
-        if '.gz' in fname:
-            with gzip.open(fname, "rb") as f:
-                boosthist.update(pickle.load(f))
-        else:
-            with open(fname, 'rb') as f:
-                boosthist.update(pickle.load(f))
-
     if len(options.channel) == 1:
         options.channel = options.channel[0]
     
@@ -105,18 +90,17 @@ def main():
 
     if options.name=='':
         options.name == options.channel
-
-    if isinstance(list(boosthist.values())[0]["hist"], dict):
-        boosthist = {k: {"hist": v["hist"][options.variable], "sumw":v["sumw"]}for k, v in boosthist.items()}
-    
+        
+        
+    datasets:Dict = dict()
     for name in config.groups:
         histograms = dict(
             filter(
                 lambda _n: _n[0] in config.groups[name].processes,
-                boosthist.items()
+                config.boosthist.items()
             )
         )
-
+        
         p = dctools.datagroup(
             histograms = histograms,
             ptype      = config.groups[name].type,
@@ -127,12 +111,12 @@ def main():
             luminosity = config.luminosity.value,
             rebin      = options.rebin,
         )
-
-        #p.save()
+        
         datasets[p.name] = p
         if p.ptype == "signal":
             signal = p.name
-   
+
+
     if options.plot:
         _plot_channel = plotter.add_process_axis(datasets)
         pred = _plot_channel.project('process','systematic', options.variable)[:hist.loc('data'),:,:]
@@ -144,9 +128,22 @@ def main():
             data=None if options.blind else data, 
             syst=pred.stack('process'),
         )
+        
+        try:
+            sig_ewk = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('VBSZZ2l2nu'),:]   
+            sig_qcd = _plot_channel[{'systematic':'nominal'}].project('process', variable)[hist.loc('ZZ2l2nu'),:]   
+            sig_ewk.plot(ax=ax, histtype='step', color='red')
+            sig_qcd.plot(ax=ax, histtype='step', color='purple')
+        except:
+            pass
+    
+        ymax = np.max([line.get_ydata().max() for line in ax.lines if line.get_ydata().shape[0]>0])
+        ymin = np.min([line.get_ydata().min() for line in ax.lines if line.get_ydata().shape[0]>0])
+    
+        ax.set_ylim(0.001, 100*ymax)
+        ax.set_title(f"channel {options.channel}: {options.era}")
 
         ax.set_yscale('log')
-        bx.set_ylim([0.1, 1.9])
         plt.savefig(f'plot-{options.channel}-{options.variable}-{options.era}.pdf')
 
 
@@ -165,30 +162,34 @@ def main():
         card_name = options.channel+options.era
     else:
         card_name = options.name+options.era
+
     card = dctools.datacard(
         name = signal,
         channel= card_name
     )
     card.shapes_headers()
-
+    
     data_obs = datasets.get("data").get("nominal")
+    
     card.add_observation(data_obs)
 
     for _, p in datasets.items():
-        if p.ptype=="data":
+        print(" --> ", p.name)
+        if len(p.to_boost().shape) == 0:
+            print(f"--> histogram for the process {p.name} is empty !")
             continue
 
+        if p.ptype=="data":
+            continue
+        
         card.add_nominal(p.name, p.get("nominal"), p.ptype)
 
         card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
-        # card.add_log_normal(p.name, "CMS_res_e",  1.005)
-        # card.add_log_normal(p.name, "CMS_RES_m",  1.005) 
-        # card.add_log_normal(p.name, "UEPS"     ,  1.020)
-        
-        card.add_shape_nuisance(p.name, "CMS_res_e", p.get("ElectronEn") , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_roch" , p.get("MuonRoc")    , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_lept_sf", p.get("LeptonSF") , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_trig_sf", p.get("triggerSF"), symmetrise=False)
+       
+        card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=False)
+        card.add_shape_nuisance(p.name, f"CMS_roch_{options.era}"   , p.get("MuonRoc")   , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"CMS_lept_sf_{options.era}", p.get("LeptonSF")  , symmetrise=False)
+        card.add_shape_nuisance(p.name, f"CMS_trig_sf_{options.era}", p.get("triggerSF") , symmetrise=False)
 
         # JES/JES and UEPS
         card.add_shape_nuisance(p.name, f"CMS_jes_{options.era}", p.get("JES"), symmetrise=False) 
@@ -201,9 +202,12 @@ def main():
         
 
         # b-tagging uncertainties
-        card.add_shape_nuisance(p.name, f"CMS_btag_sf_bc_{options.era}" , p.get(f"btag_sf_bc_{options.era}")   , symmetrise=False)
-        card.add_shape_nuisance(p.name, f"CMS_btag_sf_uds_{options.era}", p.get(f"btag_sf_light_{options.era}"), symmetrise=False)
-
+        # btag_sf_bc_2016APV, btag_sf_light_2016APV
+        try:
+            card.add_shape_nuisance(p.name, f"CMS_btag_sf_uds_{options.era}", p.get(f"btag_sf_light_{options.era}"), symmetrise=False)
+            card.add_shape_nuisance(p.name, f"CMS_btag_sf_bc_{options.era}" , p.get(f"btag_sf_bc_{options.era}")   , symmetrise=False)
+        except:
+            pass 
         # b-tagging uncertainties correlated over years
         card.add_shape_nuisance(p.name, "CMS_btag_sf_bc"  , p.get("btag_sf_bc_correlated")   , symmetrise=False)
         card.add_shape_nuisance(p.name, "CMS_btag_sf_uds" , p.get("btag_sf_light_correlated"), symmetrise=False)
@@ -211,50 +215,54 @@ def main():
 
         # other uncertainties
         card.add_shape_nuisance(p.name, f"CMS_pileup_{options.era}", p.get("pileup_weight"), symmetrise=False)
+
        
         #QCD scale, PDF and other theory uncertainty
         if 'DY' not in p.name:
             card.add_qcd_scales(
-                    p.name, "CMS_QCDScale{}_{}".format(p.name, options.era), 
+                    p.name, f"CMS_QCDScale{p.name}_{options.era}", 
                     [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
         )
         
         # PDF uncertaintites / not working for the moment
         card.add_shape_nuisance(p.name, "PDF"   , p.get("PDF_weight")  , symmetrise=False)
         card.add_shape_nuisance(p.name, "AlphaS", p.get("aS_weight")   , symmetrise=False)        
-        card.add_shape_nuisance(p.name, "PDFaS" , p.get("PDFaS_weight"), symmetrise=False)
         
-        # EWK uncertainties
-        #if p.name in ["ZZ"]:
-        #    card.add_shape_nuisance(p.name, "EWKZZ", p.get("EWK"), symmetrise=False)
-        #if p.name in ["WZ"]:
-        #    card.add_shape_nuisance(p.name, "EWKWZ", p.get("EWK"), symmetrise=False)                          
+        # Electroweak Corrections uncertainties
+        if 'WZ' in p.name:
+            card.add_shape_nuisance(p.name, "ewk_corr_WZ", p.get("kEW"), symmetrise=False)
+        if 'ZZ' in p.name:
+            card.add_shape_nuisance(p.name, "ewk_corr_ZZ", p.get("kEW"), symmetrise=False)
+            
+            
+
         # define rates
         if p.name  in ["WW"]:
-            if "catEM" in card_name:
-                card.add_rate_param("NormWW_" + options.era, "catEM*", p.name)
+            if "vbs-EM" in card_name:
+                card.add_rate_param(f"NormWW_{options.era}", "vbs-EM*", p.name)
             elif "SR" in card_name:
-                card.add_rate_param("NormWW_" + options.era, card_name+'*', p.name)
+                card.add_rate_param(f"NormWW_{options.era}", card_name+'*', p.name)
         
         # define rate 3L categoryel 
         elif p.name in ["WZ"]:
-            if "cat3L" in card_name:
-                card.add_rate_param("NormWZ_" + options.era, "cat3L*", p.name)
+            if "vbs-3L" in card_name:
+                card.add_rate_param(f"NormWZ_{options.era}", "vbs-3L*", p.name)
             elif "SR" in card_name:
-                card.add_rate_param("NormWZ_" + options.era, card_name+'*', p.name)
+                card.add_rate_param(f"NormWZ_{options.era}", card_name+'*', p.name)
         
         # define rate for DY category
         elif p.name in ["DY"]:
             if "DY" in card_name:
-                card.add_rate_param("NormDY_" + options.era, "catDY*", p.name)
+                card.add_rate_param(f"NormDY_{options.era}", "vbs-DY*", p.name)
             elif "SR" in card_name:
-                card.add_rate_param("NormDY_" + options.era, card_name+'*', p.name)
+                card.add_rate_param(f"NormDY_{options.era}", card_name+'*', p.name)
+        
         # define rate for TOP category
-        elif p.name in ["TOP"]:
-            if "TOP" in card_name:
-                card.add_rate_param("NormTOP_" + options.era, "catTOP*", p.name)
+        elif p.name in ["TT"]:
+            if "TT" in card_name:
+                card.add_rate_param(f"NormTOP_{options.era}", "vbs-TT*", p.name)
             elif "SR" in card_name:
-                card.add_rate_param("NormTOP_" + options.era, card_name+'*', p.name) 
+                card.add_rate_param(f"NormTOP_{options.era}", card_name+'*', p.name) 
         card.add_auto_stat()
 
     # saving the datacard
