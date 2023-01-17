@@ -219,7 +219,7 @@ def mcplot(
                x_vals, 
                height = np.divide(syst_uncert_up + syst_uncert_dw, pred_values, where=pred_values!=0),
                width  = (r_edge - l_edge) / len(x_vals),
-               bottom = 1 - np.divide(syst_uncert_dw, pred_values, where=pred_values!=0),
+               bottom = np.divide(pred_values - syst_uncert_dw, pred_values, where=pred_values!=0),
                color  = "blue", alpha  = 0.2, zorder = 0
         )
     
@@ -251,7 +251,8 @@ def check_systematic(
     syst: List[hist.Hist] | hist.Hist | hist.Stack = None, 
     syst_axis_name: str = 'systematic',
     plot_file_name: str = 'check-sys',
-    output_dir: str = './systematic-check/', 
+    output_dir: str = './systematic-check/',
+    xrange: List = [],
     **kwargs) -> Any:
     # inspired from boost Hist
     
@@ -267,7 +268,7 @@ def check_systematic(
     r_edge = pred.axes.edges[-1][-1]
     
     pred_stat_error = np.sqrt(pred.values(0))
-        
+   
     if syst is not None:
         syst_list = set([
             i.replace('Up','').replace('Down','') for i in syst.axes[syst_axis_name]
@@ -314,22 +315,24 @@ def check_systematic(
             )
             bx.bar( 
                 x_vals, 
-                height = 2*pred_stat_error/pred_values,
+                height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0),
                 width  = (r_edge - l_edge) / len(x_vals),
-                bottom = 1 - pred_stat_error/pred_values,
+                bottom = np.divide(pred_values - pred_stat_error, pred_values, where=pred_values!=0),
                 color  = "grey",
                 alpha  = 0.4,
             )
             
             bx.hist(
                 x_vals, bins=pred.axes[0].edges,
-                weights= syst_uncert_up/pred_values, lw=1.5,
+                weights=np.divide(syst_uncert_up, pred_values, where=pred_values!=0), 
+                lw=1.5,
                 color='red', histtype='step', 
                 label='Up'
             )
             bx.hist(
                 x_vals, bins=pred.axes[0].edges,
-                weights= syst_uncert_dw/pred_values, lw=1.5,
+                weights= np.divide(syst_uncert_dw, pred_values, where=pred_values!=0),
+                lw=1.5,
                 color='blue', histtype='step', 
                 label='Down'
             )
@@ -342,5 +345,9 @@ def check_systematic(
             ax.set_ylabel('events')
             ax.set_yscale('log')
             
+            if len(xrange) > 0:
+                bx.set_xlim(xrange)
             
             fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.pdf')
+            fig.savefig(f'{output_dir}/{plot_file_name}-{pred.axes[0].name}-{s}.png')
+            
