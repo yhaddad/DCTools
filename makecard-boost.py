@@ -175,7 +175,7 @@ def main():
 
     for _, p in datasets.items():
         print(" --> ", p.name)
-        if len(p.to_boost().shape) == 0:
+        if len(p.to_boost().shape) == 0 or p.get("nominal").sum().value == 0:
             print(f"--> histogram for the process {p.name} is empty !")
             continue
 
@@ -183,9 +183,9 @@ def main():
             continue
         
         card.add_nominal(p.name, p.get("nominal"), p.ptype)
-
+        
         card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
-       
+        
         card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=False)
         card.add_shape_nuisance(p.name, f"CMS_roch_{options.era}"   , p.get("MuonRoc")   , symmetrise=False)
         card.add_shape_nuisance(p.name, f"CMS_lept_sf_{options.era}", p.get("LeptonSF")  , symmetrise=False)
@@ -231,11 +231,9 @@ def main():
         # Electroweak Corrections uncertainties
         if 'WZ' in p.name:
             card.add_shape_nuisance(p.name, "ewk_corr_WZ", p.get("kEW"), symmetrise=False)
-        if 'ZZ' in p.name:
+        if ('ZZ' in p.name) and ('EWK' not in p.name):
             card.add_shape_nuisance(p.name, "ewk_corr_ZZ", p.get("kEW"), symmetrise=False)
             
-            
-
         # define rates
         if p.name  in ["WW"]:
             if "vbs-EM" in card_name:
@@ -258,7 +256,7 @@ def main():
                 card.add_rate_param(f"NormDY_{options.era}", card_name+'*', p.name)
         
         # define rate for TOP category
-        elif p.name in ["TT"]:
+        elif p.name in ["TOP"]:
             if "TT" in card_name:
                 card.add_rate_param(f"NormTOP_{options.era}", "vbs-TT*", p.name)
             elif "SR" in card_name:

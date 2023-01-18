@@ -239,9 +239,23 @@ class datacard:
             self.nuisances[nuisance] = {}
         self.nuisances[nuisance][process] = value
 
-    def add_nominal(self, process, shape, type):
+    def add_nominal(self, process, shape, ptype):
         value = shape.sum().value
-        self.rates.append((process, value, type))
+        if np.any(shape.values(0)<0):
+            updated_value = np.where(
+                shape.values(0) <= 0,  
+                np.zeros_like(shape.values(0)), 
+                shape.values(0)
+            )
+            shape = hist.Hist(
+                hist.axis.Variable(shape.axes[0].edges),
+            ).fill(
+              shape.axes[0].centers,
+              weight=updated_value
+            )
+            value = shape.sum()
+            
+        self.rates.append((process, value, ptype))
         self.shape_file[process] = shape
         self.nominal_hist = shape
 
@@ -267,12 +281,7 @@ class datacard:
                 uncert_dw[var_dw >= 0.95] = 0
 
                 uncert = np.maximum(uncert_up, uncert_dw)
-
-                # uncert_r = np.divide(
-                #     uncert, self.nominal_hist.values(0),
-                #     out=np.zeros_like(uncert)*-1,
-                #     where=self.nominal_hist.values(0) != 0
-                # )
+                
                 shapes.append(uncert)
             shapes = np.array(shapes)
             uncert = shapes.max(axis=0)
@@ -328,22 +337,14 @@ class datacard:
             
             # removing bogus normalisations
             var_up = np.where(
-                shape[0].values(0) < 0, 
-                np.where(
-                    self.nominal_hist.values(0) < 0,  
-                    np.zeros_like(shape[0].values(0)), 
-                    self.nominal_hist.values(0)
-                ),
+                (shape[0].values(0) <= 0) | np.isinf(shape[0].values(0)), 
+                self.nominal_hist.values(0),
                 shape[0].values(0)
             )
             
-            var_up = np.where(
-                shape[1].values(0) < 0, 
-                np.where(
-                    self.nominal_hist.values(0) < 0,  
-                    np.zeros_like(shape[1].values(0)), 
-                    self.nominal_hist.values(0)
-                ),
+            var_dw = np.where(
+                (shape[1].values(0) <= 0) | np.isinf(shape[1].values(0)), 
+                self.nominal_hist.values(0),
                 shape[1].values(0)
             )
             
