@@ -157,14 +157,10 @@ def main():
             plot_file_name=f'check-sys-{options.channel}-{options.era}'
         )
 
-    card_name = 'noname'
-    if options.name == '':
-        card_name = options.channel+options.era
-    else:
-        card_name = options.name+options.era
+    card_name = options.channel+options.era
 
     card = dctools.datacard(
-        name = signal,
+        name = signal if len(options.name)==0 else options.name,
         channel= card_name
     )
     card.shapes_headers()
@@ -184,10 +180,12 @@ def main():
         
         card.add_nominal(p.name, p.get("nominal"), p.ptype)
         
+        # luminausity
         card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
         
-        card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=False)
-        card.add_shape_nuisance(p.name, f"CMS_roch_{options.era}"   , p.get("MuonRoc")   , symmetrise=False)
+        # scale factors / resolution
+        card.add_shape_nuisance(p.name, f"CMS_res_e_{options.era}"  , p.get("ElectronEn"), symmetrise=True)
+        card.add_shape_nuisance(p.name, f"CMS_res_m_{options.era}"  , p.get("MuonRoc")   , symmetrise=True)
         card.add_shape_nuisance(p.name, f"CMS_lept_sf_{options.era}", p.get("LeptonSF")  , symmetrise=False)
         card.add_shape_nuisance(p.name, f"CMS_trig_sf_{options.era}", p.get("triggerSF") , symmetrise=False)
 
@@ -197,36 +195,36 @@ def main():
         card.add_shape_nuisance(p.name, f"CMS_UES_{options.era}", p.get("UES"), symmetrise=False)
         
         # Can maybe ne correlated over era's? 
-        card.add_shape_nuisance(p.name, f"CMS_UEPS_FRS_{options.era}", p.get("UEPS_FSR"), symmetrise=False)
-        card.add_shape_nuisance(p.name, f"CMS_UEPS_ISR_{options.era}", p.get("UEPS_ISR"), symmetrise=False)
+        card.add_shape_nuisance(p.name, f"PS_FSR_{options.era}", p.get("UEPS_FSR"), symmetrise=False)
+        card.add_shape_nuisance(p.name, f"PS_ISR_{options.era}", p.get("UEPS_ISR"), symmetrise=False)
         
 
         # b-tagging uncertainties
         # btag_sf_bc_2016APV, btag_sf_light_2016APV
         try:
-            card.add_shape_nuisance(p.name, f"CMS_btag_sf_uds_{options.era}", p.get(f"btag_sf_light_{options.era}"), symmetrise=False)
-            card.add_shape_nuisance(p.name, f"CMS_btag_sf_bc_{options.era}" , p.get(f"btag_sf_bc_{options.era}")   , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"CMS_btag_sf_uds_{options.era}" , p.get(f"btag_sf_light_{options.era}"), symmetrise=True)
+            card.add_shape_nuisance(p.name, f"CMS_btag_sf_bc_{options.era}"  , p.get(f"btag_sf_bc_{options.era}")   , symmetrise=False)
+            card.add_shape_nuisance(p.name, f"CMS_btag_df_stat_{options.era}", p.get("btag_sf_stat")            , symmetrise=False)
         except:
-            pass 
+            pass
         # b-tagging uncertainties correlated over years
         card.add_shape_nuisance(p.name, "CMS_btag_sf_bc"  , p.get("btag_sf_bc_correlated")   , symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_btag_sf_uds" , p.get("btag_sf_light_correlated"), symmetrise=False)
-        card.add_shape_nuisance(p.name, "CMS_btag_df_stat", p.get("btag_sf_stat")            , symmetrise=False)
+        card.add_shape_nuisance(p.name, "CMS_btag_sf_uds" , p.get("btag_sf_light_correlated"), symmetrise=True)
 
         # other uncertainties
         card.add_shape_nuisance(p.name, f"CMS_pileup_{options.era}", p.get("pileup_weight"), symmetrise=False)
 
        
         #QCD scale, PDF and other theory uncertainty
-        if 'DY' not in p.name:
+        if 'gg' not in p.name:
             card.add_qcd_scales(
                     p.name, f"CMS_QCDScale{p.name}_{options.era}", 
                     [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
         )
         
         # PDF uncertaintites / not working for the moment
-        card.add_shape_nuisance(p.name, "PDF"   , p.get("PDF_weight")  , symmetrise=False)
-        card.add_shape_nuisance(p.name, "AlphaS", p.get("aS_weight")   , symmetrise=False)        
+        card.add_shape_nuisance(p.name, "pdf"   , p.get("PDF_weight"), symmetrise=False)
+        card.add_shape_nuisance(p.name, "alphaS", p.get("aS_weight" ), symmetrise=False)        
         
         # Electroweak Corrections uncertainties
         if 'WZ' in p.name:

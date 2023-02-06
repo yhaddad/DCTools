@@ -132,16 +132,6 @@ class datagroup:
                     proc=proc
                 )
                 bh_hist = bh_hist * _scale
-
-            # To use more elegant slicing switch to Hist
-            # bh_hist = hist.Hist(bh_hist)
-            
-                        
-            # Select one channel
-            # bh_hist = bh_hist[{
-            #     "channel" : self.channel,
-            #     self.observable : hist.rebin(self.rebin)
-            # }]
             
             if self.stacked.ndim:
                 self.stacked += bh_hist
@@ -336,18 +326,24 @@ class datacard:
             )
             
             # removing bogus normalisations
-            var_up = np.where(
-                (shape[0].values(0) <= 0) | np.isinf(shape[0].values(0)), 
-                self.nominal_hist.values(0),
-                shape[0].values(0)
-            )
+            var_up = np.where((var_up <= 0) | np.isinf(var_up), self.nominal_hist.values(0), var_up)
+            var_dw = np.where((var_dw <= 0) | np.isinf(var_dw), self.nominal_hist.values(0), var_dw)
             
-            var_dw = np.where(
-                (shape[1].values(0) <= 0) | np.isinf(shape[1].values(0)), 
-                self.nominal_hist.values(0),
-                shape[1].values(0)
-            )
+            if np.all(np.sign(var_up-self.nominal_hist.values(0))*np.sign(var_dw-self.nominal_hist.values(0))>0):
+                print(f"WARNING: variations {process}:{cardname} are on the same dirrection")
+                print("nom : ", np.round(self.nominal_hist.values(0), 5))
+                print("up  : ", np.round(var_up, 5))
+                print("down: ", np.round(var_dw, 5))
+
             
+            if symmetrise:
+                uncert = np.maximum(
+                    np.abs(self.nominal_hist.values(0) - var_up),
+                    np.abs(self.nominal_hist.values(0) - var_dw)
+                )
+                var_up = self.nominal_hist.values(0) + uncert
+                var_dw = self.nominal_hist.values(0) + uncert
+                
             h_uncert_up = bh.Histogram(
                 bh.axis.Variable(self.nominal_hist.axes[0].edges),
             ).fill(
@@ -362,29 +358,7 @@ class datacard:
             )
             
             shape = (h_uncert_dw, h_uncert_up)
-            if symmetrise:
-                uncert = np.maximum(np.abs(self.nominal_hist.values(0) - shape[0].values(0)),
-                                    np.abs(self.nominal_hist.values(0) - shape[1].values(0)))
-                
-                h_uncert_up = bh.Histogram(
-                    bh.axis.Variable(self.nominal_hist.axes[0].edges),
-                ).fill(
-                  self.nominal_hist.axes[0].centers,
-                  weight=self.nominal_hist.values(0) + uncert
-                )
-                h_uncert_dw = bh.Histogram(
-                    bh.axis.Variable(self.nominal_hist.axes[0].edges),
-                ).fill(
-                  self.nominal_hist.axes[0].centers,
-                  weight=self.nominal_hist.values(0) - uncert
-                )
-                h_uncert_up.name = self.nominal_hist.name
-                h_uncert_up.axes[0].name = self.nominal_hist.name
-                h_uncert_dw.name = self.nominal_hist.name
-                h_uncert_dw.axes[0].name = self.nominal_hist.name
 
-                shape = (h_uncert_dw, h_uncert_up)
-                
             self.add_nuisance(process, nuisance, 1.0)
             self.shape_file[process + "_" + cardname + "Up"] = shape[1]
             self.shape_file[process + "_" + cardname + "Down"] = shape[0]
@@ -405,7 +379,7 @@ class datacard:
         self.extras.add(
             "{} autoMCStats 0 0 1".format(self.channel)
         )
-
+        
     def dump(self):
         # adding shapes
         for line in self.shapes:
@@ -442,15 +416,19 @@ class datacard:
         self.dc_file.append(rate_line)
         self.dc_file.append("-"*30)
         for nuisance in sorted(self.nuisances.keys()):
-          # print(" source --> ", nuisance)
-          scale = self.nuisances[nuisance]
-          line_ = "{0:<10}".format(nuisance)
-          for process, _, _ in self.rates:
-              if process in scale:
-                  line_ += "{0:>15}".format("%.3f" % scale[process])
-              else:
-                  line_ += "{0:>15}".format("-")
-          self.dc_file.append(line_)
+            # print(" source --> ", nuisance)
+            scale = self.nuisances[nuisance]
+            line_ = "{0:<10}".format(nuisance)
+            for process, _, _ in self.rates:
+                if process in scale:
+                    line_ += "{0:>15}".format("%.3f" % scale[process])
+                else:
+                    line_ += "{0:>15}".format("-")
+            self.dc_file.append(line_)
         self.dc_file += self.extras
+        # adding groups in the the datacards
+        #for gname, group in self.groups.items():
+        #    self.dc_file.append(f"{gname} group="+" ".join(group))
+
         with open(self.dc_name, "w") as fout:
             fout.write("\n".join(self.dc_file))

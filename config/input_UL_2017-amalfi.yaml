@@ -13,18 +13,6 @@ groups:
   WW:
     processes:
       - WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
-      - GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8
-      - VBS_OSWW_LL_TuneCP5_13TeV-madgraph-pythia8
-      - VBS_OSWW_TT_TuneCP5_13TeV-madgraph-pythia8
-      - VBS_OSWW_TL_TuneCP5_13TeV-madgraph-pythia8
-      - VBS_OSWW_LT_TuneCP5_13TeV-madgraph-pythia8
     type:
       background
     color:
@@ -46,9 +34,9 @@ groups:
       - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       # - DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
       # - DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
       # - DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
@@ -64,13 +52,13 @@ groups:
       background
     color:
       "#F6D68D"
-  TOP:
+  Top:
     processes:
-      # - ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
-      # - ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
-      # - ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/.root
-      # - ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8
-      # - ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8
+      - ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/.root
+      - ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8
+      - ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8
       - tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8
       - TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
       - TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8
@@ -86,26 +74,40 @@ groups:
       - WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8
       - WZZ_TuneCP5_13TeV-amcatnlo-pythia8
       - ZZZ_TuneCP5_13TeV-amcatnlo-pythia8
-      # - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
-      # - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
-      # - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
-      # - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
-      # - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
-      # - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
     type:
       background
     color:
       "#580C82"
+  ggVV:
+    processes:
+      - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8
+    type:
+      background
+    color:
+      "#580CCC"
   ZZ2l2nu:
     processes:
       - ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
-      # - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
-      # - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
     type:
       signal
     color:
       "#8E31A1"
-  VBSZZ2l2nu:
+  ekw_ZZ2l2nu:
     processes:
       - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
     type:

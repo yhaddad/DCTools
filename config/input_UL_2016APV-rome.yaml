@@ -1,17 +1,26 @@
 boosthist:
-  - ./data/merged-histogram-rome-2016.pkl.gz
+  - ./data/merged-histogram-rome-2016APV.pkl.gz
 
 xsections:
   !include ./config/xsections_2018.yaml
 
 luminosity: 
-  value: 16.5
+  value: 19.5
   uncer: 1.025
+
 
 groups:
   WW:
     processes:
       - WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8
+      - GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8
+      - GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8
     type:
       background
     color:
@@ -24,29 +33,37 @@ groups:
       background
     color:
       "#46B3A5"
+  ZZ:
+    processes:
+      - ZZTo4L_TuneCP5_13TeV_powheg_pythia8
+      # - ZZJJTo4L_TuneCP5_13TeV-madgraph-pythia8
+      - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
+      - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
+    type:
+      background
+    color:
+      "#cba6f7"
   DY:
     processes:
       - DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos
-      # - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8
       - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      # - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
       # - DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8
       # - DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
-      - EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8
     type:
       background
     color:
@@ -77,28 +94,6 @@ groups:
       background
     color:
       "#580C82"
-  ggVV:
-    processes:
-      - GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8
-      - GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8
-      - GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8
-    type:
-      background
-    color:
-      "#580CCC"
   ZZ2l2nu:
     processes:
       - ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
@@ -118,13 +113,14 @@ groups:
       - MuonEG
       - DoubleMuon
       - SingleMuon
+      - SingleElectron
       - DoubleEG
-      - SingleMuon
     type:
       data
     color:
       "#181926"
 
+      
 plotting:
     vbs-DY:
         dilep_mt:
@@ -151,6 +147,10 @@ plotting:
             rebin: 2
             range: [0, 1]
             blind: false
+        gnn_flat:
+            rebin: 5
+            range: [0, 1]
+            blind: false
     vbs-3L:
         dilep_mt:
             rebin: 4
@@ -173,6 +173,10 @@ plotting:
             range: [0, 5]
             blind: false
         gnn_score:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+        gnn_flat:
             rebin: 5
             range: [0, 1]
             blind: false
@@ -201,6 +205,10 @@ plotting:
             rebin: 5
             range: [0, 1]
             blind: false
+        gnn_flat:
+            rebin: 5
+            range: [0, 1]
+            blind: false
     vbs-TT:
         dilep_mt:
             rebin: 4
@@ -226,6 +234,10 @@ plotting:
             rebin: 5
             range: [0, 1]
             blind: false
+        gnn_flat:
+            rebin: 5
+            range: [0, 1]
+            blind: false
     vbs-NR:
         dilep_mt:
             rebin: 4
@@ -248,6 +260,10 @@ plotting:
             range: [0, 5]
             blind: false
         gnn_score:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+        gnn_flat:
             rebin: 5
             range: [0, 1]
             blind: false
@@ -277,6 +293,6 @@ plotting:
             range: [0, 1]
             blind: true
         gnn_flat:
-            rebin: 2
+            rebin: 5
             range: [0, 1]
             blind: true
