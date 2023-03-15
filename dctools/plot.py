@@ -57,21 +57,27 @@ def fill_with_interpolation_1d(hview):
 
 
 def add_process_axis(
-        histograms: dict[str, datagroup], 
+        histograms: dict[str, datagroup] | dict[str, hist.Hist], 
         axis_name: str = 'process',
         flow: bool = True) -> hist.Hist:
 
     storage = None
     histos = {}
     for it, (n, p) in enumerate(histograms.items()):
-        _h = p.to_boost()
+        if isinstance(p, hist.Hist):
+            _h = p
+        elif isinstance(p, datagroup):
+            _h = p.to_boost()
+        else:
+            raise ValueError("hot recongnised type")
+            
         if len(_h.shape) == 0:
             continue
         histos[n] = _h
         # print(n, _h.view(flow=flow).shape)
         if it == 0:
-            axes = [axis for axis in p.to_boost().axes]
-            storage = p.to_boost()._storage_type()
+            axes = [axis for axis in _h.axes]
+            storage = _h._storage_type()
             
     iterator = histos.keys()
     new_axis = hist.axis.StrCategory(iterator, name=axis_name, label=axis_name)
@@ -260,7 +266,7 @@ def mcplot(
         data.plot(ax=ax, color='black', histtype='errorbar')
     
     ax.set_xlim(l_edge, r_edge)
-    ax.legend(ncol=2, loc='upper right')
+    ax.legend(ncol=2, loc='upper right', fontsize=20)
     bx.set_xlabel(pred_ksum.axes[0].label)
     bx.set_ylabel('data/mc')
     ax.set_ylabel('events')

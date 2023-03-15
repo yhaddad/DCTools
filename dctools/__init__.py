@@ -10,6 +10,8 @@ import yaml
 import json
 import gzip
 import pickle
+from copy import deepcopy
+from scipy import interpolate
 from typing import Any, Set, List, Dict, Tuple, IO
 
 __all__ = ['datacard', 'datagroup', "plot"]
@@ -84,6 +86,18 @@ def read_config(file: str):
         except yaml.YAMLError as exc:
             print (exc)
 
+def fill_with_interpolation_1d(hview):
+    '''
+    interpolate to fill nan values
+    '''
+    inds = np.arange(hview.value.shape[0])
+    good = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance))
+    fval = interpolate.interp1d(inds[good], hview.value[good],bounds_error=False)
+    fvar = interpolate.interp1d(inds[good], hview.variance[good],bounds_error=False)
+    new_val = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance),hview.value   ,fval(inds))
+    new_var = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance),hview.variance,fvar(inds))
+    return new_val, new_var
+            
 class datagroup:
     def __init__(self, histograms, observable:str="MT", name:str="DY",
                  channel:str="catSR_VBS", ptype:str="background", 
@@ -161,6 +175,7 @@ class datagroup:
                 return hist.Hist()
   
     def to_boost(self) -> hist.Hist:
+        
         return self.stacked
 
     def xs_scale(self, sumw, proc):
@@ -179,6 +194,11 @@ class datagroup:
         scale = 1.0
         scale = xsec * self.lumi/sumw
         return scale
+    
+    def __add__(self, other)-> Any:
+        new_datagroup = deepcopy(other)
+        new_datagroup.stacked = self.stacked + other.stacked
+        return new_datagroup
 
 
 class datacard:
