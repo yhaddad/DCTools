@@ -178,7 +178,7 @@ def main():
         if p.ptype=="data":
             continue
         
-        card.add_nominal(p.name, p.get("nominal"), p.ptype)
+        if not card.add_nominal(p.name, p.get("nominal"), p.ptype): continue
         
         # luminausity
         card.add_log_normal(p.name, f"CMS_lumi_{options.era}", config.luminosity.uncer)
@@ -232,7 +232,7 @@ def main():
         #QCD scale, PDF and other theory uncertainty
         if 'gg' not in p.name:
             card.add_qcd_scales(
-                    p.name, f"CMS_QCDScale{p.name}_{options.era}", 
+                    p.name, f"CMS_QCDScale{p.name}", 
                     [p.get("QCDScale0w"), p.get("QCDScale1w"), p.get("QCDScale2w")]
         )
         

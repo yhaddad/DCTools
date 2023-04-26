@@ -52,7 +52,8 @@ def fill_with_interpolation_1d(hview):
         np.isfinite(hview.value) & 
         np.isfinite(hview.variance) & 
         (np.abs(hview.value)    < 1e30) & 
-        (np.abs(hview.variance) < 1e30) 
+        (np.abs(hview.variance) < 1e30) &
+        (hview.value >= 0)
     )
     good = np.where(mask)
     
@@ -60,8 +61,8 @@ def fill_with_interpolation_1d(hview):
     fvar = interpolate.interp1d(inds[good], hview.variance[good],bounds_error=False)
     new_val = np.where(mask, hview.value   ,fval(inds))
     new_var = np.where(mask, hview.variance,fvar(inds))
-    if np.any(~mask):
-        print("not good : ", hview.variance[~mask], "changed  : ", new_var[~mask])
+    # if np.any(~mask):
+    #     print("not good : ", hview.variance[~mask], "changed  : ", new_var[~mask])
     return new_val, new_var
 
 

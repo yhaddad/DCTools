@@ -139,8 +139,6 @@ class datagroup:
         for proc, _hist in self.histograms.items():
             # skip empty catgeories
             if self.channel not in _hist['hist'].axes['channel']:
-                #print(f'[WARNING] : {self.name}: {self.observable}: {self.channel} not present in axes. available channels:')
-                #print(list(_hist['hist'].axes['channel']))
                 continue
             
             bh_hist:hist.Hist = _hist['hist'][{
@@ -168,7 +166,6 @@ class datagroup:
     def get(self, systvar) -> hist.Hist:
         shapeUp, shapeDown = None, None
         if "nominal" in systvar:
-            #print("get() : ", type(self.stacked), self.stacked)
             return self.stacked[{'systematic': systvar}].project(self.observable)
         else:
             try:
@@ -276,14 +273,20 @@ class datacard:
         self.nuisances[nuisance][process] = value
 
     def add_nominal(self, process, shape, ptype):
-        print("before : ", shape.values(0), shape.sum())
-        shape = self.assure_positive_definit_shape(shape)
-        print("after  : ", shape.values(0), shape.sum())
-        value = shape.sum().value
+        if shape.sum().value <= 0:
+            print("[WARNING] bogus normalisation", process, shape.sum())
+            return False
+        else:
+            shape = self.assure_positive_definit_shape(shape)
+            if hasattr(shape.sum(), 'value'):
+                value = shape.sum().value
+            else:
+                value = shape.sum()
 
-        self.rates.append((process, value, ptype))
-        self.shape_file[process] = shape
-        self.nominal_hist = shape
+            self.rates.append((process, value, ptype))
+            self.shape_file[process] = shape
+            self.nominal_hist = shape
+            return True
 
     def add_qcd_scales(self, process, cardname, qcd_scales):
         nuisance = "{:<30} shape".format(cardname)
@@ -365,11 +368,11 @@ class datacard:
             var_up = np.where((var_up <= 0) | np.isinf(var_up), self.nominal_hist.values(0), var_up)
             var_dw = np.where((var_dw <= 0) | np.isinf(var_dw), self.nominal_hist.values(0), var_dw)
             
-            if np.all(np.sign(var_up-self.nominal_hist.values(0))*np.sign(var_dw-self.nominal_hist.values(0))>0):
-                print(f"WARNING: variations {process}:{cardname} are on the same dirrection")
-                print("nom : ", np.round(self.nominal_hist.values(0), 5))
-                print("up  : ", np.round(var_up, 5))
-                print("down: ", np.round(var_dw, 5))
+            #if np.all(np.sign(var_up-self.nominal_hist.values(0))*np.sign(var_dw-self.nominal_hist.values(0))>0):
+            #    print(f"WARNING: variations {process}:{cardname} are on the same dirrection")
+            #    print("nom : ", np.round(self.nominal_hist.values(0), 5))
+            #    print("up  : ", np.round(var_up, 5))
+            #    print("down: ", np.round(var_dw, 5))
 
             
             if symmetrise:
@@ -437,7 +440,6 @@ class datacard:
         i_signal = 0
         i_backgr = 1 
         for tup in self.rates:
-            print("[debug ] rate :: ", tup)
             bins_line += "{0:>15}".format(self.channel)
             proc_line += "{0:>15}".format(tup[0])
             if 'signal' in tup[2]:
@@ -456,7 +458,6 @@ class datacard:
         self.dc_file.append(rate_line)
         self.dc_file.append("-"*30)
         for nuisance in sorted(self.nuisances.keys()):
-            # print(" source --> ", nuisance)
             scale = self.nuisances[nuisance]
             line_ = "{0:<10}".format(nuisance)
             for process, _, _ in self.rates:
@@ -467,7 +468,7 @@ class datacard:
             self.dc_file.append(line_)
         self.dc_file += self.extras
         # adding groups in the the datacards
-        #for gname, group in self.groups.items():
+        # for gname, group in self.groups.items():
         #    self.dc_file.append(f"{gname} group="+" ".join(group))
 
         with open(self.dc_name, "w") as fout:
