@@ -48,11 +48,20 @@ def fill_with_interpolation_1d(hview):
     interpolate to fill nan values
     '''
     inds = np.arange(hview.value.shape[0])
-    good = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance))
+    mask = (
+        np.isfinite(hview.value) & 
+        np.isfinite(hview.variance) & 
+        (np.abs(hview.value)    < 1e30) & 
+        (np.abs(hview.variance) < 1e30) 
+    )
+    good = np.where(mask)
+    
     fval = interpolate.interp1d(inds[good], hview.value[good],bounds_error=False)
     fvar = interpolate.interp1d(inds[good], hview.variance[good],bounds_error=False)
-    new_val = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance),hview.value   ,fval(inds))
-    new_var = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance),hview.variance,fvar(inds))
+    new_val = np.where(mask, hview.value   ,fval(inds))
+    new_var = np.where(mask, hview.variance,fvar(inds))
+    if np.any(~mask):
+        print("not good : ", hview.variance[~mask], "changed  : ", new_var[~mask])
     return new_val, new_var
 
 
@@ -69,15 +78,15 @@ def add_process_axis(
         elif isinstance(p, datagroup):
             _h = p.to_boost()
         else:
-            raise ValueError("hot recongnised type")
-            
+            raise ValueError("not recongnised type")
+        
         if len(_h.shape) == 0:
             continue
-        histos[n] = _h
         # print(n, _h.view(flow=flow).shape)
-        if it == 0:
+        if storage is None:
             axes = [axis for axis in _h.axes]
             storage = _h._storage_type()
+        histos[n] = _h
             
     iterator = histos.keys()
     new_axis = hist.axis.StrCategory(iterator, name=axis_name, label=axis_name)
@@ -222,6 +231,14 @@ def mcplot(
         for s in syst_list:
             if 'nominal'==s: continue
             if 'QCD' in s: continue
+            # if 'PDF' in s: continue
+            if 'JES_' in s: continue
+            # if 'ElectronEn' in s: continue
+            # if 'UEPS_' in s: continue
+            # if 'btag_sf_stat' in s: continue
+            if 'btag_sf_light' in s: continue
+            # if 'trigger' in s: continue
+            # if 'Lepton' in s: continue
             
             shape_up = sum([_hs[{syst_axis_name : s + 'Up'  }] for _hs in syst]).values(0)
             shape_dw = sum([_hs[{syst_axis_name : s + 'Down'}] for _hs in syst]).values(0)

@@ -88,14 +88,23 @@ def read_config(file: str):
 
 def fill_with_interpolation_1d(hview):
     '''
-    interpolate to fill nan values
+    interpolate to fill nan and infinite values values
+    This function removes as well the negative bins 
+    as this produces a bogus normalisation error in 
+    cobine tool
     '''
     inds = np.arange(hview.value.shape[0])
-    good = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance))
+    mask = (
+        np.isfinite(hview.value) & 
+        np.isfinite(nview.variance) & 
+        (hview.value > 0) & 
+        (np.abs(hview.value) < 1e30) 
+    )
+    good = np.where(mask)
     fval = interpolate.interp1d(inds[good], hview.value[good],bounds_error=False)
     fvar = interpolate.interp1d(inds[good], hview.variance[good],bounds_error=False)
-    new_val = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance),hview.value   ,fval(inds))
-    new_var = np.where(np.isfinite(hview.value) & np.isfinite(hview.variance),hview.variance,fvar(inds))
+    new_val = np.where(mask,hview.value   ,fval(inds))
+    new_var = np.where(mask,hview.variance,fvar(inds))
     return new_val, new_var
             
 class datagroup:
@@ -226,6 +235,23 @@ class datacard:
             "cards-{}/shapes-{}.root".format(name, channel)
         )
 
+    def assure_positive_definit_shape(self, shape):
+        if np.any(shape.values(0)<0):
+            updated_value = np.where(
+                shape.values(0) <= 0,  
+                np.zeros_like(shape.values(0)), 
+                shape.values(0)
+            )
+            pos_shape = hist.Hist(
+                hist.axis.Variable(shape.axes[0].edges),
+            ).fill(
+              shape.axes[0].centers,
+              weight=updated_value
+            )
+        else:
+            pos_shape = shape
+        return pos_shape
+
     def shapes_headers(self):
         filename = self.dc_name.replace("dat", "root")
         lines = "shapes * * {file:<20} $PROCESS $PROCESS_$SYSTEMATIC"
@@ -250,21 +276,11 @@ class datacard:
         self.nuisances[nuisance][process] = value
 
     def add_nominal(self, process, shape, ptype):
+        print("before : ", shape.values(0), shape.sum())
+        shape = self.assure_positive_definit_shape(shape)
+        print("after  : ", shape.values(0), shape.sum())
         value = shape.sum().value
-        if np.any(shape.values(0)<0):
-            updated_value = np.where(
-                shape.values(0) <= 0,  
-                np.zeros_like(shape.values(0)), 
-                shape.values(0)
-            )
-            shape = hist.Hist(
-                hist.axis.Variable(shape.axes[0].edges),
-            ).fill(
-              shape.axes[0].centers,
-              weight=updated_value
-            )
-            value = shape.sum()
-            
+
         self.rates.append((process, value, ptype))
         self.shape_file[process] = shape
         self.nominal_hist = shape
@@ -377,7 +393,10 @@ class datacard:
               weight=var_dw
             )
             
-            shape = (h_uncert_dw, h_uncert_up)
+            shape = (
+                self.assure_positive_definit_shape(h_uncert_dw), 
+                self.assure_positive_definit_shape(h_uncert_up)
+            )
 
             self.add_nuisance(process, nuisance, 1.0)
             self.shape_file[process + "_" + cardname + "Up"] = shape[1]
@@ -418,6 +437,7 @@ class datacard:
         i_signal = 0
         i_backgr = 1 
         for tup in self.rates:
+            print("[debug ] rate :: ", tup)
             bins_line += "{0:>15}".format(self.channel)
             proc_line += "{0:>15}".format(tup[0])
             if 'signal' in tup[2]:
