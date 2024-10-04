@@ -1,14 +1,13 @@
 boosthist:
-  # - ./data/merged-histogram-fes-2017.pkl.gz
-  - ./data/merged-histogram-setif-2017.pkl.gz
+  # - ./data/merged-histogram-fes-2016.pkl.gz
+  - ./data/merged-histogram-faiyum-2016-withaQGC.pkl.gz
 
 xsections:
   !include ./config/xsections_2018.yaml
 
 luminosity: 
-  value: 41.48
-  uncer: 1.023
-
+  value: 16.5
+  uncer: 1.025
 
 groups:
   WW:
@@ -29,25 +28,25 @@ groups:
   DY:
     processes:
       - DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos
-      - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
-      # - DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      #- DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      #- DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      #- DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_HT-2500toInf_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_HT-400to600_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_HT-600to800_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_HT-70to100_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_HT-800to1200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
+      #- DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      #- DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8
       - EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8
     type:
       background
@@ -105,12 +104,27 @@ groups:
     processes:
       - ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8
     type:
-      signal
+      background
     color:
       "#8E31A1"
-  ekw_ZZ2l2nu:
+  #ekw_ZZ2l2nu:
+  #  processes:
+  #    - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
+  #  type:
+  #    signal
+  #  color:
+  #    "#FE4773"
+  ekw_ZZ2l2nu_NLO:
     processes:
-      - ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8
+      - ZZTo2Mu2Nu_TuneCP5_DipoleRecoil_13TeV_powheg_pythia8
+      - ZZTo2E2Nu_TuneCP5_DipoleRecoil_13TeV_powheg_pythia8
+    type:
+      signal
+    color:
+      "#98a100"
+  eft_ZZ2l2nu:
+    processes:
+      - ZZ2JTo2L2Nu2J_EWK_aQGC_TuneCP5_13TeV-madgraph-pythia8
     type:
       signal
     color:
@@ -130,19 +144,23 @@ groups:
 plotting:
     vbs-DY:
         dilep_mt:
-            rebin: 2
+            rebin: 1
             range: [0, 300]
             blind: false
         dilep_pt:
-            rebin: 2 
+            rebin: 1 
             range: [0, 300]
             blind: false
         dilep_m:
-            rebin: 2 
+            rebin: 1 
             range: [60, 120]
             blind: false
+        dijet_mass:
+            rebin: 2
+            range: [0,2000]
+            blind: false
         met_pt:
-            rebin: 2 
+            rebin: 1 
             range: [0, 250]
             blind: false
         njets:

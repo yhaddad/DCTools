@@ -21,10 +21,13 @@ class config_input:
         self._cfg = cfg 
     
     def __getitem__(self, key:str)->Any:
-        v = self._cfg[key]
-        if isinstance(v, dict):
-            return config_input(v)
-    
+        try:
+            v = self._cfg[key]
+            if isinstance(v, dict):
+                return config_input(v)
+        except AttributeError:
+            return None
+            
     def __setitem__(self, key:str, value:Any)->None:
         self._cfg[key] = value
 
@@ -96,7 +99,7 @@ def fill_with_interpolation_1d(hview):
     inds = np.arange(hview.value.shape[0])
     mask = (
         np.isfinite(hview.value) & 
-        np.isfinite(nview.variance) & 
+        np.isfinite(hview.variance) & 
         (hview.value > 0) & 
         (np.abs(hview.value) < 1e30) 
     )
@@ -145,7 +148,6 @@ class datagroup:
                 "channel" : self.channel,
                 self.observable : hist.rebin(self.rebin)
             }]
-
             _scale = 1 
             if ptype.lower() != "data": 
                 _scale = self.xs_scale(
@@ -161,7 +163,6 @@ class datagroup:
             
     def merge_categories(self):
         pass
-
 
     def get(self, systvar) -> hist.Hist:
         shapeUp, shapeDown = None, None
@@ -179,9 +180,17 @@ class datagroup:
             except ValueError:
                 print(f'{systvar} is not present in the boost histogram')
                 return hist.Hist()
-  
-    def to_boost(self) -> hist.Hist:
-        
+    
+    def get_eft(self, name) -> hist.Hist:
+        try:
+            return self.stacked[
+                {'systematic': name + 'Up'}
+            ].project(self.observable)
+        except ValueError:
+            print(f'{name} is not present in the boost histogram')
+            return hist.Hist()
+
+    def to_boost(self) -> hist.Hist:        
         return self.stacked
 
     def xs_scale(self, sumw, proc):
@@ -380,7 +389,7 @@ class datacard:
                     np.abs(self.nominal_hist.values(0) - var_up),
                     np.abs(self.nominal_hist.values(0) - var_dw)
                 )
-                var_up = self.nominal_hist.values(0) + uncert
+                var_up = self.nominal_hist.values(0) - uncert
                 var_dw = self.nominal_hist.values(0) + uncert
                 
             h_uncert_up = bh.Histogram(
@@ -451,6 +460,8 @@ class datacard:
                 i_signal -= 1
             else:
                 i_backgr += 1
+
+            print("debug: ", indx_line, " : ", tup)
 
         self.dc_file.append(bins_line)
         self.dc_file.append(proc_line)

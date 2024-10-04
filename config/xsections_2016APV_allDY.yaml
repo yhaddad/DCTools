@@ -35,7 +35,7 @@ DY2JetsToLL_M-50_LHEZpT_50-150_TuneCP5_13TeV-amcnloFXFX-pythia8:
   kr: 1.0
   xsec: 169.646518824308913
 DYJetsToLL_M-50_TuneCP5_13TeV-amcatnloFXFX-pythia8: 
-  br: 1.0
+  br: 0.28826254133395096
   kr: 1.0
   xsec: 6545.062778193921076
 TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8: 
@@ -162,7 +162,7 @@ ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8:
 ZZ2JTo2L2Nu2J_EWK_aQGC_TuneCP5_13TeV-madgraph-pythia8:
   br: 1.0
   kr: 1.0
-  xsec: 0.1374
+  xsec: 0.00308
 GluGluToContinToZZTo2e2mu_13TeV_TuneCP5_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
@@ -376,15 +376,15 @@ DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-p
   kr: 1.0
   xsec: 583
 DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.12435101577068743
   kr: 1.0
   xsec: 5129
 DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.12435101577068743
   kr: 1.0
   xsec: 951.5
 DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.12435101577068743
   kr: 1.0
   xsec: 361.4
 DYJetsToLL_M-50_TuneCP5_13TeV-madgraphMLM-pythia8:
@@ -420,33 +420,29 @@ tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8:
   kr: 1.0
   xsec: 0.07561
 DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.5873864428953615
   kr: 1.0
   xsec: 1485.0
 DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.5873864428953615
   kr: 1.0
   xsec: 97.2
 DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.5873864428953615
   kr: 1.0
   xsec: 3.701
 DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.5873864428953615
   kr: 1.0
   xsec: 0.5086
 DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.5873864428953615
   kr: 1.0
   xsec: 397.4
 DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
-  br: 1.0
+  br: 0.5873864428953615
   kr: 1.0
   xsec: 0.04728
-WWJJToLNuLNu_OS_EWK_TuneCP5_13TeV_madgraph-pythia8:
-  br: 1.0 
-  kr: 1.0
-  xsec: 0.439
 ZZTo2E2Nu_TuneCP5_DipoleRecoil_13TeV_powheg_pythia8:
   br: 1.0
   kr: 1.0

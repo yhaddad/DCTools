@@ -1,14 +1,15 @@
 boosthist:
-  # - ./data/merged-histogram-fes-2018.pkl.gz
-  - ./data/merged-histogram-setif-2018.pkl.gz
-    
+  # - ./data/merged-histogram-fes-2016APV.pkl.gz
+  # - ./data/merged-histogram-setif-2016APV.pkl.gz
+  - ./data/merged-histogram-faiyum-2016APV.pkl.gz
+
 xsections:
   !include ./config/xsections_2018.yaml
 
-luminosity:
-  # from : https://docs.google.com/presentation/d/1gEF2jExqS1hWs-dlYgxrTT2xQztYbBZcrLdw45Aiy7g/edit#slide=id.gaa4333d304_0_0
-  value: 59.83
+luminosity: 
+  value: 19.5
   uncer: 1.025
+
 
 groups:
   WW:
@@ -29,15 +30,15 @@ groups:
   DY:
     processes:
       - DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos
-      # - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      # - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
-      - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_1J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      - DYJetsToLL_2J_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
+      # - DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
       # - DYJetsToLL_M-50_HT-100to200_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
       # - DYJetsToLL_M-50_HT-1200to2500_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
       # - DYJetsToLL_M-50_HT-200to400_TuneCP5_PSweights_13TeV-madgraphMLM-pythia8
@@ -115,116 +116,198 @@ groups:
       signal
     color:
       "#FE4773"
+  eft_zz2l2nu:
+    processes:
+      - ZZ2JTo2L2Nu2J_EWK_aQGC_TuneCP5_13TeV-madgraph-pythia8
+    type:
+      signal
+    color:
+      "#FE4713"
   data:
     processes:
       - MuonEG
       - DoubleMuon
       - SingleMuon
-      - EGamma
+      - DoubleEG
+      - SingleMuon
     type:
       data
     color:
       "#181926"
 
-
+      
 plotting:
     vbs-DY:
         dilep_mt:
-            rebin: 2
-            range: [0, 400]
+            rebin: 1
+            range: [0, 300]
             blind: false
         dilep_pt:
-            rebin: 2 
-            range: [0, 400]
+            rebin: 1 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 1 
+            range: [60, 120]
             blind: false
         met_pt:
-            rebin: 2 
+            rebin: 1 
             range: [0, 250]
             blind: false
+        njets:
+            rebin: 1
+            range: [2, 5]
+            blind: false
         gnn_score:
-            rebin: 10
+            rebin: 1
             range: [0, 1]
             blind: false
         gnn_flat:
-            rebin: 5
+            rebin: 1
             range: [0, 1]
             blind: false
-        dijet_mass:
-            rebin: 5
-            range: [0,2000]
-            blind: false         
     vbs-3L:
         dilep_mt:
-            rebin: 2
-            range: [0,400]
+            rebin: 4
+            range: [0, 600]
             blind: false
         dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
             rebin: 2 
-            range: [0, 400]
+            range: [60, 120]
             blind: false
         met_pt:
             rebin: 2 
             range: [0, 250]
             blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
         gnn_score:
-            rebin: 10
+            rebin: 5
             range: [0, 1]
             blind: false
         gnn_flat:
             rebin: 5
             range: [0, 1]
-            blind: false
-        dijet_mass:
-            rebin: 5
-            range: [0,2000]
             blind: false
     vbs-EM:
         dilep_mt:
-            rebin: 2
-            range: [0, 400]
+            rebin: 4
+            range: [0, 600]
             blind: false
         dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
             rebin: 2 
-            range: [0, 400]
+            range: [60, 120]
             blind: false
         met_pt:
             rebin: 2 
             range: [0, 250]
             blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
         gnn_score:
-            rebin: 10
+            rebin: 5
             range: [0, 1]
             blind: false
         gnn_flat:
             rebin: 5
             range: [0, 1]
             blind: false
-        dijet_mass:
+    vbs-TT:
+        dilep_mt:
+            rebin: 4
+            range: [0, 600]
+            blind: false
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
+        gnn_score:
             rebin: 5
-            range: [0,2000]
+            range: [0, 1]
+            blind: false
+        gnn_flat:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+    vbs-NR:
+        dilep_mt:
+            rebin: 4
+            range: [0, 600]
+            blind: false
+        dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: false
+        dilep_m:
+            rebin: 2 
+            range: [60, 120]
+            blind: false
+        met_pt:
+            rebin: 2 
+            range: [0, 250]
+            blind: false
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: false
+        gnn_score:
+            rebin: 5
+            range: [0, 1]
+            blind: false
+        gnn_flat:
+            rebin: 5
+            range: [0, 1]
             blind: false
     vbs-SR:
         dilep_mt:
-            rebin: 2
-            range: [0, 400]
+            rebin: 4
+            range: [0, 600]
             blind: true
         dilep_pt:
+            rebin: 3 
+            range: [0, 300]
+            blind: true
+        dilep_m:
             rebin: 2 
-            range: [0, 400]
+            range: [60, 120]
             blind: true
         met_pt:
             rebin: 2 
             range: [0, 250]
             blind: true
+        njets:
+            rebin: 1
+            range: [0, 5]
+            blind: true
         gnn_score:
-            rebin: 5
+            rebin: 2
             range: [0, 1]
             blind: true
         gnn_flat:
-            rebin: 10
-            range: [0, 1]
-            blind: true
-        dijet_mass:
             rebin: 5
-            range: [0,2000]
+            range: [0, 1]
             blind: true
