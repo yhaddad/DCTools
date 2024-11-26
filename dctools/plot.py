@@ -231,13 +231,13 @@ def mcplot(
         syst_dw = []
         for s in syst_list:
             if 'nominal'==s: continue
-            if 'QCD' in s: continue
+            #if 'QCD' in s: continue
             # if 'PDF' in s: continue
-            if 'JES_' in s: continue
+            #if 'JES_' in s: continue
             # if 'ElectronEn' in s: continue
             # if 'UEPS_' in s: continue
             # if 'btag_sf_stat' in s: continue
-            if 'btag_sf_light' in s: continue
+            #if 'btag_sf_light' in s: continue
             # if 'trigger' in s: continue
             # if 'Lepton' in s: continue
             
@@ -284,7 +284,7 @@ def mcplot(
         data.plot(ax=ax, color='black', histtype='errorbar')
     
     ax.set_xlim(l_edge, r_edge)
-    ax.legend(ncol=2, loc='upper right', fontsize=20)
+    ax.legend(ncol=2, loc='upper right', fontsize=15)
     bx.set_xlabel(pred_ksum.axes[0].label)
     bx.set_ylabel('data/mc')
     ax.set_ylabel('events')
