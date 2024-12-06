@@ -10,6 +10,7 @@ import yaml
 import json
 import gzip
 import pickle
+import traceback
 from copy import deepcopy
 from scipy import interpolate
 from typing import Any, Set, List, Dict, Tuple, IO
@@ -70,6 +71,119 @@ def construct_include(loader: config_loader, node: yaml.Node) -> Any:
 
 yaml.add_constructor('!include', construct_include, config_loader)
 
+def combine_adapter(uprootfile,
+                    empty_templates: Dict[str, hist.hist.Hist] | None,
+                    combine_fit: str = 'fit_b',
+                    group: str = 'DY',
+                    channels: List[str] = ['cat3L16', 'catEM16', 'catSR16'],
+                    name: str = 'dilep_mt',
+                    label: str = '$M_{T}^{\\ell\\ell}$ (GeV)',
+                   ):
+    """
+    This function's purpose is to load root histograms from a combine fit file
+    and build multi-dimensional boost-histograms (hist) from them in the style of the standard SMQawa outputs
+    """
+    channelhistos = {}
+    if empty_templates is None:
+        empty_templates = combine_empty_histos(uprootfile,
+                                               channels=channels,
+                                               name=name,
+                                               label=label,
+                                              )
+    for channel in channels:
+        filter = f'shapes_{combine_fit}/{channel}/{group}'
+        #if "total" not in group:
+        #    filter += "*"
+        subkeys = uprootfile.keys(filter_name=filter)
+        if len(subkeys) == 1:
+            subkey = subkeys[0]
+            rawtype, channel, rawgroup = subkey.split("/")
+            type = rawtype.replace('shapes_', '')
+            group = rawgroup.split(";")[0]
+            assert type == combine_fit
+        elif len(subkeys) > 1:
+            raise KeyError(f'Too many keys found for filter={filter}: subkeys={subkeys}')
+        else:
+            # we'll insert an empty template histogram in this case
+            subkey = None
+        try:
+            emptyhisto = deepcopy(empty_templates[channel])
+            if subkey is None:
+                basehisto = update_axes_meta(emptyhisto, args={'xaxis': {'name': name, 'label': label}})
+                basehistos = {'nominal': basehisto, 'statErrorUp': basehisto, 'statErrorDown': basehisto}
+            else:
+                roothisto = uprootfile[subkey]
+                if isinstance(roothisto, uproot.models.TGraph.Model_TGraphAsymmErrors_v3):
+                    x_values, ycentral = roothisto.values()
+                    ylow = roothisto.errors('low')[1]
+                    yhigh = roothisto.errors('high')[1]
+                    basehisto = update_axes_meta(emptyhisto,  args={'xaxis': {'name': name, 'label': label}})
+                    basehistoup, basehistodown = deepcopy(basehisto),  deepcopy(basehisto)
+                    basehisto[:] = np.stack([ycentral, np.zeros_like(ycentral)], axis=1)
+                    basehistoup[:] = np.stack([ycentral + yhigh, np.zeros_like(ycentral)], axis=1)
+                    basehistodown[:] = np.stack([ycentral - ylow, np.zeros_like(ycentral)], axis=1)
+                    basehistos = {'nominal': basehisto, 'statErrorUp': basehistoup, 'statErrorDown': basehistodown}
+                    #basehisto[:] = ycentral
+                else:
+                    rawhisto = roothisto.to_hist()
+                    try:
+                        tmp = list(fill_with_interpolation_1d(rawhisto.view()))
+                        rawhisto[:] = np.stack(tmp, axis=1)
+                    except:
+                        print(f"combine_adapter failed fill_with_interpolation_1d for group={group} channel={channel} combine_fit={combine_fit}")
+                    finally:
+                        pass
+                    basehisto = update_axes_meta(rawhisto,  args={'xaxis': {'name': name, 'label': label}})
+                    basehistos = {'nominal': basehisto, 'statErrorUp': basehisto, 'statErrorDown': basehisto}
+            systhisto = dict_to_hist_axis(basehistos, axis_name='systematic', axis_label=None, axis_type = 'StrCategory')
+            channelhistos[channel] = systhisto
+        except Exception as e:
+            print(f"Unable to convert model group={group} channel={channel}...")
+            traceback.print_exc()
+
+    try:
+        finalhisto = dict_to_hist_axis(channelhistos, axis_name='channel', axis_label=None, axis_type = 'StrCategory')
+    except:
+        print("channel binning incompatibility, combine_adapter returning dictionary of channel histograms")
+        # Incompatible binning can prevent merging this axis, will need to be handled as a potential case
+        finalhisto = channelhistos
+    return finalhisto
+
+def combine_empty_histos(uprootfile,
+                         channels: List[str] = ['cat3L16', 'catEM16', 'catSR16'],
+                         name: str = 'dilep_mt',
+                         label: str = '$M_{T}^{\\ell\\ell}$ (GeV)',
+                        ):
+    """
+    This function can generate empty histograms for backfilling multidimensional
+    histograms when certain processes are not included in a channel, a typical
+    result of having 0 events in a template and needing to disable it in the combine fit
+    """
+    channelhistos: Dict = {}
+    channelemptyhistos: Dict = {}
+    for channel in channels:
+        filter = f'shapes_*/{channel}/*'
+        subkeys = uprootfile.keys(filter_name=filter)
+        if len(subkeys) > 0:
+            subkeys = [key for key in subkeys if "data" not in key]
+            subkey = subkeys[0]
+            rawtype, channel, rawgroup = subkey.split("/")
+            group = rawgroup.split(";")[0]
+            try:
+                roothisto = uprootfile[subkey]
+                rawhisto = roothisto.to_hist()
+                rawhisto.reset()
+                channelemptyhistos[channel] = rawhisto
+                #basehisto = update_axes_meta(rawhisto,  args={'xaxis': {'name': name, 'label': label}})
+                #channelemptyhistos[channel] = basehisto
+            except:
+                print(f"Unable to generate empty histogram for channel={channel}")
+        else:
+            print("Found no matching subkeys, but...", [x for x in uprootfile.keys() if channel in x ])
+            print(f"Unable to generate empty histogram for channel={channel}")
+            return None
+    return channelemptyhistos
+
 def read_config(file: str):
     with open(file) as f:
         try:
@@ -84,8 +198,69 @@ def read_config(file: str):
                 else:
                     with open(fname, 'rb') as fn_:
                         boosthist.update(pickle.load(fn_))
-            config.boosthist = boosthist 
+            config.boosthist = boosthist
+            combinehistos:Dict = {}
+            if hasattr(config, "combinehist"):
+                for fname in config.combinehist:
+                    channels = config.combinehist[fname].channels
+                    observable = config.combinehist[fname].observable
+                    label = config.combinehist[fname].label
+                    edges = config.combinehist[fname].edges
+                    channel_groups = config.combinehist[fname].channel_groups
+                    try:
+                        froot = uproot.open(fname)
+                        for group in list(config.groups) + ['total', 'total_signal', 'total_background']: #'total_covar' is 2d bin-to-bin
+                            if group not in combinehistos:
+                                combinehistos[group] = {'prefit': {},
+                                                        'fit_b': {},
+                                                        'fit_s': {},
+                                                        'edges': {},
+                                                        'channel_groups': {},
+                                                       }
+                            empty_templates = combine_empty_histos(froot,
+                                                                   channels = channels,
+                                                                   name=observable,
+                                                                   label=label,
+                                                                   )
+                            combinehistos[group]['prefit'].update({observable: combine_adapter(froot,
+                                                                                               empty_templates=empty_templates,
+                                                                                               combine_fit='prefit',
+                                                                                               group=group,
+                                                                                               channels=channels,
+                                                                                               name=observable,
+                                                                                               label=label,
+                                                                                              )})
+                            combinehistos[group]['fit_b'].update({observable: combine_adapter(froot,
+                                                                                              empty_templates=empty_templates,
+                                                                                              combine_fit='fit_b',
+                                                                                              group=group,
+                                                                                              channels=channels,
+                                                                                              name=observable,
+                                                                                              label=label
+                                                                                             )})
+                            combinehistos[group]['fit_s'].update({observable: combine_adapter(froot,
+                                                                                              empty_templates=empty_templates,
+                                                                                              combine_fit='fit_s',
+                                                                                              group=group,
+                                                                                              channels=channels,
+                                                                                              name=observable,
+                                                                                              label=label
+                                                                                             )})
+                            combinehistos[group]['edges'].update({observable: edges})
+                            combinehistos[group]['channel_groups'].update({observable: channel_groups})
+                    except:
+                        print(f"Unable to load combinehist file {fname} as declared in config.combinehist")
+                        combine_adapter(froot,
+                                        empty_templates=None,
+                                        combine_fit='prefit',
+                                        group=group,
+                                        channels=channels,
+                                        name=observable,
+                                        label=label
+                                       )
+            config.combinehist = combinehistos
             return config
+
         except yaml.YAMLError as exc:
             print (exc)
 
@@ -484,3 +659,261 @@ class datacard:
 
         with open(self.dc_name, "w") as fout:
             fout.write("\n".join(self.dc_file))
+
+# borrowed from https://github.com/NJManganelli/chai/blob/main/src/chai/histtools/manipulation.py
+def dict_to_hist_axis(
+    histos: dict[str, hist.hist.Hist],
+    axis_name: str,
+    axis_label: str | None = None,
+    axis_type: str = "StrCategory",
+    axis_storage: str | None = None,
+    axis_args: dict[str, Any] | None = None,
+    axis_iter_override: Any | None = None,
+) -> hist.hist.Hist:
+    keys = []
+    storage = None
+    for it, (key, val) in enumerate(histos.items()):
+        keys.append(key)
+        if it == 0:
+            try:
+                axes = list(val.axes)
+            except Exception:
+                axes = []
+            try:
+                storage = val._storage_type()
+            except Exception:
+                storage = None
+    if axis_storage is None:
+        pass  # use storage of the first histogram type
+    elif isinstance(axis_storage, str):
+        try:
+            storage = getattr(hist.storage, axis_storage)()
+        except Exception as err:
+            available_storages = get_hist_storages(string=True)
+            msg = f"{axis_storage} not a valid type, choose from {available_storages}"
+            raise ValueError(msg) from err
+    # elif isinstance(axis_storage, get_hist_storages(string=False)):
+    #     storage = axis_storage
+    # else:
+    #     msg = f"Unsupported storage type requested: {axis_storage}"
+    #     raise ValueError(msg)
+
+    all_args: dict[str, Any] = {
+        "name": axis_name,
+        "label": axis_label if axis_label else axis_name,
+    }
+    if axis_args:
+        all_args.update(axis_args)
+
+    flow = True
+    # if "flow" in all_args:
+    #     flow = all_args["flow"]
+
+    # Determine iterable categories
+
+    if axis_type == "Boolean":
+        # Boolean(*, name: 'str' = '', label: 'str' = '', metadata: 'Any' = None, __dict__: 'dict[str, Any] | None' = None) -> 'None'
+        new_axis = hist.axis.Boolean(**all_args)
+        axes.insert(0, new_axis)
+        h = hist.hist.Hist(
+            *axes,
+            storage,
+        )
+        for key, val in histos.items():
+            if key.lower() == "true":
+                idx = new_axis.index(True)
+            elif key.lower() == "false":
+                idx = new_axis.index(False)
+            else:
+                msg = f"Unsupported axis value or type for Boolean axis: {key} (type: {type(key)}"
+                raise ValueError(msg)
+            if val is not None:
+                if len(axes) > 1:
+                    h.view(flow=flow)[idx, ...] = val.view(flow=flow)
+                else:
+                    h.view(flow=flow)[idx] = val.view(flow=flow)
+    elif axis_type == "IntCategory":
+        # IntCategory(categories: 'Iterable[int]', *, name: 'str' = '', label: 'str' = '', metadata: 'Any' = None, growth: 'bool' = False, __dict__: 'dict[str, Any] | None' = None) -> 'None'
+        if axis_iter_override:
+            iterator = axis_iter_override
+        else:
+            iterator = [int(key) for key in keys]
+        new_axis = hist.axis.IntCategory(iterator, **all_args)
+        axes.insert(0, new_axis)
+        h = hist.hist.Hist(
+            *axes,
+            storage,
+        )
+        filled_keys = set()
+        for key, val in histos.items():
+            idx = new_axis.index(int(key))
+            if idx in filled_keys:
+                msg = f"Duplicate key found for IntCategory type: {key} -> {int(key)}"
+                raise ValueError(msg)
+            filled_keys.add(idx)
+            if val is not None:
+                if len(axes) > 1:
+                    h.view(flow=flow)[idx, ...] = val.view(flow=flow)
+                else:
+                    h.view(flow=flow)[idx] = val.view(flow=flow)
+    elif axis_type == "Integer":
+        # Integer(start: 'int', stop: 'int', *, name: 'str' = '', label: 'str' = '', metadata: 'Any' = None, flow: 'bool' = True, underflow: 'bool | None' = None, overflow: 'bool | None' = None, growth: 'bool' = False, circular: 'bool' = False, __dict__: 'dict[str, Any] | None' = None) -> 'None'
+        if axis_iter_override:
+            iterator = axis_iter_override
+        else:
+            iterator = [
+                int(key) for key in keys if key.lower() not in ["underflow", "overflow"]
+            ]
+        if "start" not in all_args:
+            all_args["start"] = min(iterator)
+        if "stop" not in all_args:
+            all_args["stop"] = max(iterator)
+        new_axis = hist.axis.Integer(**all_args)
+        axes.insert(0, new_axis)
+        h = hist.hist.Hist(
+            *axes,
+            storage,
+        )
+        filled_keys = set()
+        for key, val in histos.items():
+            if key.lower() == "underflow":
+                idx = new_axis.underflow
+            elif key.lower() == "overflow":
+                idx = new_axis.overflow
+            else:
+                idx = new_axis.index(int(key))
+            if idx in filled_keys:
+                msg = f"Duplicate key found for Integer type: {key} -> {int(key)}"
+                raise ValueError(msg)
+            filled_keys.add(idx)
+            if val is not None:
+                if len(axes) > 1:
+                    h.view(flow=flow)[idx, ...] = val.view(flow=flow)
+                else:
+                    h.view(flow=flow)[idx] = val.view(flow=flow)
+    elif axis_type == "Regular":
+        # Regular(bins: 'int', start: 'float', stop: 'float', *, name: 'str' = '', label: 'str' = '', metadata: 'Any' = None, flow: 'bool' = True, underflow: 'bool | None' = None, overflow: 'bool | None' = None, growth: 'bool' = False, circular: 'bool' = False, transform: 'bha.transform.AxisTransform | None' = None, __dict__: 'dict[str, Any] | None' = None) -> 'None'
+        if axis_iter_override:
+            iterator = axis_iter_override
+        else:
+            iterator = [
+                float(key)
+                for key in keys
+                if key.lower() not in ["underflow", "overflow"]
+            ]
+        if "bins" not in all_args:
+            all_args["bins"] = len(iterator)
+        if "start" not in all_args:
+            all_args["start"] = min(iterator)
+        if "stop" not in all_args:
+            all_args["stop"] = max(iterator)
+        new_axis = hist.axis.Regular(**all_args)
+        axes.insert(0, new_axis)
+        h = hist.hist.Hist(
+            *axes,
+            storage,
+        )
+        filled_keys = set()
+        for key, val in histos.items():
+            if key.lower() == "underflow" and flow:
+                idx = 0
+            elif key.lower() == "overflow" and flow:
+                idx = new_axis.extent - 1
+            else:
+                idx = new_axis.index(float(key))
+
+            if idx in filled_keys:
+                msg = f"Duplicate key found for Integer type: {key} -> {float(key)}"
+                raise ValueError(msg)
+            filled_keys.add(idx)
+            if val is not None:
+                if len(axes) > 1:
+                    h.view(flow=flow)[idx, ...] = val.view(flow=flow)
+                else:
+                    h.view(flow=flow)[idx] = val.view(flow=flow)
+    elif axis_type == "StrCategory":
+        # StrCategory(categories: 'Iterable[str]', *, name: 'str' = '', label: 'str' = '', metadata: 'Any' = None, growth: 'bool' = False, __dict__: 'dict[str, Any] | None' = None) -> 'None'
+        iterator = axis_iter_override if axis_iter_override else list(keys)
+        new_axis = hist.axis.StrCategory(iterator, **all_args)
+        axes.insert(0, new_axis)
+        h = hist.hist.Hist(
+            *axes,
+            storage,
+        )
+        filled_keys = set()
+        for key, val in histos.items():
+            idx = new_axis.index(key)
+
+            if idx in filled_keys:
+                msg = f"Duplicate key found for StrCategory type: {key} -> {float(key)}"
+                raise ValueError(msg)
+            filled_keys.add(idx)
+            if val is not None:
+                if len(axes) > 1:
+                    h.view(flow=flow)[idx, ...] = val.view(flow=flow)
+                else:
+                    h.view(flow=flow)[idx] = val.view(flow=flow)
+    elif axis_type == "Variable":
+        # Variable(edges: 'Iterable[float]', *, name: 'str' = '', label: 'str' = '', metadata: 'Any' = None, flow: 'bool' = True, underflow: 'bool | None' = None, overflow: 'bool | None' = None, growth: 'bool' = False, circular: 'bool' = False, __dict__: 'dict[str, Any] | None' = None) -> 'None'
+        if axis_iter_override:
+            iterator = axis_iter_override
+        else:
+            iterator = sorted(
+                [
+                    float(key)
+                    for key in keys
+                    if key.lower() not in ["underflow", "overflow"]
+                ]
+            )
+        new_axis = hist.axis.Variable(**all_args)
+        axes.insert(0, new_axis)
+        h = hist.hist.Hist(
+            *axes,
+            storage,
+        )
+        filled_keys = set()
+        for key, val in histos.items():
+            if key.lower() == "underflow" and flow:
+                idx = 0
+            elif key.lower() == "overflow" and flow:
+                idx = new_axis.extent - 1
+            else:
+                idx = new_axis.index(float(key))
+
+            if idx in filled_keys:
+                msg = f"Duplicate key found for Variable type: {key} -> {float(key)}"
+                raise ValueError(msg)
+            filled_keys.add(idx)
+            if val is not None:
+                if len(axes) > 1:
+                    h.view(flow=flow)[idx, ...] = val.view(flow=flow)
+                else:
+                    h.view(flow=flow)[idx] = val.view(flow=flow)
+    else:
+        msg = f"Unsupported axis_type {axis_type}"
+        raise ValueError(msg)
+
+    return h
+
+# borrowed from https://github.com/NJManganelli/chai/blob/main/src/chai/histtools/manipulation.py
+def update_axes_meta(
+    histo: hist.hist.Hist,
+    args: dict[str, dict[str, str]],
+    verbose: bool = False,
+) -> hist.hist.Hist:
+    """Update a hist name or label.
+
+    args: dictionary of old-axis name: dictionary('name': new-axis-name, 'label': new-axis-label)
+    """
+    old_axes = {axis.name: axis for axis in histo.axes}
+    for old_axis_name, attributes in args.items():
+        if old_axis_name not in old_axes:
+            if verbose:
+                print(  # noqa: T201
+                    f"{old_axis_name} not in the axes names: {old_axes.keys()}"
+                )
+            continue
+        to_up = old_axes[old_axis_name].__dict__
+        for key, val in attributes.items():
+            to_up[key] = val
+    return histo
