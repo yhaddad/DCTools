@@ -5,7 +5,7 @@ import os
 import numpy as np
 import matplotlib as mlp
 import matplotlib.pyplot as plt
-from typing import Any, List
+from typing import Any, List, Iterable
 from hist.intervals import ratio_uncertainty
 from . import datagroup
 from cycler import cycler
