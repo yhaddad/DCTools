@@ -80,7 +80,7 @@ def add_process_axis(
             _h = p.to_boost()
         else:
             raise ValueError("not recongnised type")
-        
+
         if len(_h.shape) == 0:
             continue
         # print(n, _h.view(flow=flow).shape)
@@ -123,6 +123,9 @@ def add_process_axis(
 def make_split(ratio: float, gap: float = 0., ptype: str ="step") -> Any:
     from matplotlib.gridspec import GridSpec
     cax = plt.gca()
+    plt.setp(cax.get_xticklabels(), visible=False)
+    plt.setp(cax.get_yticklabels(), visible=False)
+
     box = cax.get_position()
     xmin, ymin = box.xmin, box.ymin
     xmax, ymax = box.xmax, box.ymax
@@ -140,20 +143,23 @@ def make_split(ratio: float, gap: float = 0., ptype: str ="step") -> Any:
     return ax, bx
 
 def mcplot(
-    pred: List[hist.Hist] | hist.Hist, # either a list of MC or a boost hist with sample axis
+    pred: List[hist.Hist] | hist.Hist | hist.Stack, # either a list of MC or a boost hist with sample axis
     data: List[hist.Hist] | hist.Hist = None, 
     syst: List[hist.Hist] | hist.Hist = None, 
     proc_axis_name: str = 'process', 
     syst_axis_name: str = 'systematic', 
+    combine_fit: str = 'pre-combine',
+    combine_uncertainty_histo: hist.Hist | None = None,
+    combine_histo_edges: Iterable[int] | Iterable[float] | None = None,
     **kwargs) -> Any:
     # inspired from boost Hist
     ax, bx = make_split(0.7)
-    
+
     x_vals = None
     l_edge = None
     r_edge = None
     pred_values = None
-   
+
     ax.set_title(kwargs.get('title', ''))
     if isinstance(pred, hist.Stack):
         pred_hstk = pred
@@ -175,10 +181,16 @@ def mcplot(
     if "colors" in kwargs:
         ax.update({"prop_cycle":cycler(color=kwargs["colors"])})
         
-    
     pred_hstk.plot(ax=ax, stack=True, histtype="fill")
-    pred_stat_error = np.sqrt(np.abs(pred_ksum.values(0)))
-    
+    if combine_fit == 'pre-combine':
+        pred_stat_error = np.sqrt(np.abs(pred_ksum.values(0)))
+    else:
+        if combine_uncertainty_histo is not None:
+            # This is actually the TOTAL uncertainty, stat + syst from combine
+            pred_stat_error = np.sqrt(combine_uncertainty_histo.variances())
+        else:
+            # If we're missing the total uncertainty from a combine fit (prefit, fit_b, or fit_s) then don't draw any uncertainty band
+            pred_stat_error = np.zeros_like(pred_ksum.values(0))
     ax.bar( 
         x_vals, 
         height= 2*pred_stat_error,
@@ -189,7 +201,6 @@ def mcplot(
         edgecolor="gray",
         hatch=4 * "/",
     )
-    
     bx.axhline(
         1, color="black", linestyle="dashed", linewidth=1.0
     )
@@ -197,7 +208,7 @@ def mcplot(
     # MC stat error bars
     ratio = np.ones_like(pred_values)
     ratio_uncert = np.zeros_like(pred_values)
-    
+
     bx.bar( 
            x_vals, 
            height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0), 
@@ -205,8 +216,9 @@ def mcplot(
            bottom = 1 - np.divide(pred_stat_error,pred_values, where=pred_values!=0),
            color  = "red",
            alpha  = 0.4,
+           label="stat" if (combine_fit == "pre-combine") else "stat+syst",
     )
-    
+
     if data is not None:
         data.plot(ax=ax, color='black', histtype='errorbar')
         ratio = np.divide(data.values(0), pred_values, where=pred_values!=0)
@@ -223,7 +235,7 @@ def mcplot(
             linestyle="none",
         )
         
-    if syst is not None:
+    if syst is not None and combine_fit == "prefit":
         syst_list = set([
             i.replace('Up','').replace('Down','') for i in syst.axes[syst_axis_name]
         ])
@@ -272,7 +284,8 @@ def mcplot(
                height = np.divide(syst_uncert_up + syst_uncert_dw, pred_values, where=pred_values!=0),
                width  = (r_edge - l_edge) / len(x_vals),
                bottom = np.divide(pred_values - syst_uncert_dw, pred_values, where=pred_values!=0),
-               color  = "blue", alpha  = 0.2, zorder = 0
+               color  = "blue", alpha  = 0.2, zorder = 0,
+               label="syst"
         )
     
     if isinstance(pred, hist.Hist):
@@ -282,15 +295,18 @@ def mcplot(
             )
     if (data is not None) and isinstance(pred, hist.Hist):
         data.plot(ax=ax, color='black', histtype='errorbar')
-    
     ax.set_xlim(l_edge, r_edge)
+    if combine_fit != "prefit" and combine_histo_edges is not None:
+        # override to fix combine stripping the axis edges from the histograms, replacing them with bin numbers
+        assert len(combine_histo_edges) == len(bx.get_xticks()), f"mismatch of edges({combine_histo_edges}) and xticks({bx.get_xticks()})"
+        bx.set_xticks(bx.get_xticks(), labels=combine_histo_edges)
     ax.legend(ncol=2, loc='upper right', fontsize=15)
+    bx.legend(loc='upper right', fontsize=15)
     bx.set_xlabel(pred_ksum.axes[0].label)
     bx.set_ylabel('data/mc')
     ax.set_ylabel('events')
     
     return ax, bx
-
 
 def check_systematic(
     pred: List[hist.Hist] | hist.Hist | hist.Stack, # either a list of MC or a boost hist with sample axis
