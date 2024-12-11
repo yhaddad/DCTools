@@ -78,6 +78,7 @@ def combine_adapter(uprootfile,
                     channels: List[str] = ['cat3L16', 'catEM16', 'catSR16'],
                     name: str = 'dilep_mt',
                     label: str = '$M_{T}^{\\ell\\ell}$ (GeV)',
+                    PFSFW: bool = False
                    ):
     """
     This function's purpose is to load root histograms from a combine fit file
@@ -86,21 +87,35 @@ def combine_adapter(uprootfile,
     channelhistos = {}
     if empty_templates is None:
         empty_templates = combine_empty_histos(uprootfile,
+                                               combine_fit=combine_fit,
                                                channels=channels,
                                                name=name,
                                                label=label,
                                               )
     for channel in channels:
-        filter = f'shapes_{combine_fit}/{channel}/{group}'
-        #if "total" not in group:
-        #    filter += "*"
+        filter_group = group
+        if PFSFW:
+            if group == "data":
+                filter_group = "data_obs"
+            elif group == "total":
+                filter_group = "TotalProcs"
+            elif group == "total_signal":
+                filter_group = "TotalSig"
+            elif group == "total_background":
+                filter_group = "TotalBkg"
+            filter = f'{channel}_{"prefit" if combine_fit == "prefit" else "postfit"}/{filter_group}'
+        else:
+            filter = f'shapes_{combine_fit}/{channel}/{filter_group}'
         subkeys = uprootfile.keys(filter_name=filter)
         if len(subkeys) == 1:
             subkey = subkeys[0]
-            rawtype, channel, rawgroup = subkey.split("/")
+            if PFSFW:
+                channel_rawtype, rawgroup = subkey.split("/")
+                channel, rawtype = channel_rawtype.rsplit("_", maxsplit=1)
+            else:
+                rawtype, channel, rawgroup = subkey.split("/")
             type = rawtype.replace('shapes_', '')
-            group = rawgroup.split(";")[0]
-            assert type == combine_fit
+            derived_group = rawgroup.split(";")[0]
         elif len(subkeys) > 1:
             raise KeyError(f'Too many keys found for filter={filter}: subkeys={subkeys}')
         else:
@@ -150,9 +165,11 @@ def combine_adapter(uprootfile,
     return finalhisto
 
 def combine_empty_histos(uprootfile,
+                         combine_fit = "prefit",
                          channels: List[str] = ['cat3L16', 'catEM16', 'catSR16'],
                          name: str = 'dilep_mt',
                          label: str = '$M_{T}^{\\ell\\ell}$ (GeV)',
+                         PFSFW: bool = False,
                         ):
     """
     This function can generate empty histograms for backfilling multidimensional
@@ -162,12 +179,19 @@ def combine_empty_histos(uprootfile,
     channelhistos: Dict = {}
     channelemptyhistos: Dict = {}
     for channel in channels:
-        filter = f'shapes_*/{channel}/*'
+        if PFSFW:
+            filter = f'{channel}_{"prefit" if combine_fit == "prefit" else "postfit"}/*'
+        else:
+            filter = f'shapes_{combine_fit}/{channel}/*'
         subkeys = uprootfile.keys(filter_name=filter)
         if len(subkeys) > 0:
             subkeys = [key for key in subkeys if "data" not in key]
             subkey = subkeys[0]
-            rawtype, channel, rawgroup = subkey.split("/")
+            if PFSFW:
+                channel_rawtype, rawgroup = subkey.split("/")
+                channel, rawtype = channel_rawtype.rsplit("_", maxsplit=1)
+            else:
+                rawtype, channel, rawgroup = subkey.split("/")
             group = rawgroup.split(";")[0]
             try:
                 roothisto = uprootfile[subkey]
@@ -184,6 +208,101 @@ def combine_empty_histos(uprootfile,
             return None
     return channelemptyhistos
 
+def read_combinehist(config):
+    combinehistos:Dict = {}
+    for cname in config.combinehist:
+        channels = config.combinehist[cname].channels
+        observable = config.combinehist[cname].observable
+        label = config.combinehist[cname].label
+        edges = config.combinehist[cname].edges if "edges" in config.combinehist[cname] else None
+        channel_groups = config.combinehist[cname].channel_groups
+
+        fit_file = config.combinehist[cname].fitDiagnostics
+        try:
+            froot = uproot.open(fit_file)
+        except Exception:
+            raise IOError(f"Unable to open fitDiagnostics file {fit_file}")
+
+        if "PFSFW_fit_b" in config.combinehist[cname]:
+            fit_b_file = config.combinehist[cname].PFSFW_fit_b
+            try:
+                fit_b_root = uproot.open(fit_b_file)
+            except Exception:
+                raise IOError(f"Unable to open postfit file {fit_b_file}")
+        else:
+            fit_b_file = None
+            fit_b_root = froot
+
+        if "PFSFW_fit_s" in config.combinehist[cname]:
+            fit_s_file = config.combinehist[cname].PFSFW_fit_s
+            try:
+                fit_s_root = uproot.open(fit_s_file)
+            except Exception:
+                raise IOError(f"Unable to open postfit file {fit_s_file}")
+        else:
+            fit_s_file = None
+            fit_s_root = froot
+
+        try:
+            if fit_s_file and fit_b_file:
+                #unc_groups = ["TotalProcs", "TotalSig", "TotalBkg"]
+                unc_groups = ['total', 'total_signal', 'total_background'] #'total_covar' is 2d bin-to-bin
+                PFSFW = True
+            elif fit_s_file or fit_b_file:
+                raise NotImplementedError("Both PFSFW_fit_b and PFSFW_fit_s should be specified or neither in this implementation")
+                PFSFW = None
+            else:
+                unc_groups = ['total', 'total_signal', 'total_background'] #'total_covar' is 2d bin-to-bin
+                PFSFW = False
+            for group in list(config.groups) + unc_groups:
+                if group not in combinehistos:
+                    combinehistos[group] = {'prefit': {},
+                                            'fit_b': {},
+                                            'fit_s': {},
+                                            'edges': {},
+                                            'channel_groups': {},
+                                           }
+                empty_templates = combine_empty_histos(fit_b_root,
+                                                       combine_fit="prefit",
+                                                       channels = channels,
+                                                       name=observable,
+                                                       label=label,
+                                                       PFSFW=PFSFW,
+                                                       )
+                combinehistos[group]['prefit'].update({observable: combine_adapter(fit_b_root,
+                                                                                   empty_templates=empty_templates,
+                                                                                   combine_fit='prefit',
+                                                                                   group=group,
+                                                                                   channels=channels,
+                                                                                   name=observable,
+                                                                                   label=label,
+                                                                                   PFSFW=PFSFW,
+                                                                                 )})
+                combinehistos[group]['fit_b'].update({observable: combine_adapter(fit_b_root,
+                                                                                  empty_templates=empty_templates,
+                                                                                  combine_fit='fit_b',
+                                                                                  group=group,
+                                                                                  channels=channels,
+                                                                                  name=observable,
+                                                                                  label=label,
+                                                                                  PFSFW=PFSFW,
+                                                                                 )})
+                combinehistos[group]['fit_s'].update({observable: combine_adapter(fit_s_root,
+                                                                                  empty_templates=empty_templates,
+                                                                                  combine_fit='fit_s',
+                                                                                  group=group,
+                                                                                  channels=channels,
+                                                                                  name=observable,
+                                                                                  label=label,
+                                                                                  PFSFW=PFSFW,
+                                                                                 )})
+                combinehistos[group]['edges'].update({observable: edges})
+                combinehistos[group]['channel_groups'].update({observable: channel_groups})
+        except Exception as e:
+            print(f"Unable to load combinehist fitDiagnostics file {fit_file} or PostFitShapesFromWorkspace files {fit_b_file}, {fit_s_file} as declared in config.combinehist")
+            traceback.print_exc()
+    return combinehistos
+
 def read_config(file: str):
     with open(file) as f:
         try:
@@ -199,66 +318,8 @@ def read_config(file: str):
                     with open(fname, 'rb') as fn_:
                         boosthist.update(pickle.load(fn_))
             config.boosthist = boosthist
-            combinehistos:Dict = {}
-            if hasattr(config, "combinehist"):
-                for fname in config.combinehist:
-                    channels = config.combinehist[fname].channels
-                    observable = config.combinehist[fname].observable
-                    label = config.combinehist[fname].label
-                    edges = config.combinehist[fname].edges
-                    channel_groups = config.combinehist[fname].channel_groups
-                    try:
-                        froot = uproot.open(fname)
-                        for group in list(config.groups) + ['total', 'total_signal', 'total_background']: #'total_covar' is 2d bin-to-bin
-                            if group not in combinehistos:
-                                combinehistos[group] = {'prefit': {},
-                                                        'fit_b': {},
-                                                        'fit_s': {},
-                                                        'edges': {},
-                                                        'channel_groups': {},
-                                                       }
-                            empty_templates = combine_empty_histos(froot,
-                                                                   channels = channels,
-                                                                   name=observable,
-                                                                   label=label,
-                                                                   )
-                            combinehistos[group]['prefit'].update({observable: combine_adapter(froot,
-                                                                                               empty_templates=empty_templates,
-                                                                                               combine_fit='prefit',
-                                                                                               group=group,
-                                                                                               channels=channels,
-                                                                                               name=observable,
-                                                                                               label=label,
-                                                                                              )})
-                            combinehistos[group]['fit_b'].update({observable: combine_adapter(froot,
-                                                                                              empty_templates=empty_templates,
-                                                                                              combine_fit='fit_b',
-                                                                                              group=group,
-                                                                                              channels=channels,
-                                                                                              name=observable,
-                                                                                              label=label
-                                                                                             )})
-                            combinehistos[group]['fit_s'].update({observable: combine_adapter(froot,
-                                                                                              empty_templates=empty_templates,
-                                                                                              combine_fit='fit_s',
-                                                                                              group=group,
-                                                                                              channels=channels,
-                                                                                              name=observable,
-                                                                                              label=label
-                                                                                             )})
-                            combinehistos[group]['edges'].update({observable: edges})
-                            combinehistos[group]['channel_groups'].update({observable: channel_groups})
-                    except:
-                        print(f"Unable to load combinehist file {fname} as declared in config.combinehist")
-                        combine_adapter(froot,
-                                        empty_templates=None,
-                                        combine_fit='prefit',
-                                        group=group,
-                                        channels=channels,
-                                        name=observable,
-                                        label=label
-                                       )
-            config.combinehist = combinehistos
+            if "combinehist" in config:
+                config.combinehist = read_combinehist(config)
             return config
 
         except yaml.YAMLError as exc:

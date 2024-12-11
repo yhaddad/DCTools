@@ -187,6 +187,8 @@ def mcplot(
     else:
         if combine_uncertainty_histo is not None:
             # This is actually the TOTAL uncertainty, stat + syst from combine
+            # may be named (total{_background,_signal} from fitDiagnostics
+            # or Total{Procs,Bkg,Sig} if from PostFitShapesFromWorkspace
             pred_stat_error = np.sqrt(combine_uncertainty_histo.variances())
         else:
             # If we're missing the total uncertainty from a combine fit (prefit, fit_b, or fit_s) then don't draw any uncertainty band
@@ -235,7 +237,7 @@ def mcplot(
             linestyle="none",
         )
         
-    if syst is not None and combine_fit == "prefit":
+    if syst is not None and combine_fit == "pre-combine":
         syst_list = set([
             i.replace('Up','').replace('Down','') for i in syst.axes[syst_axis_name]
         ])
@@ -296,7 +298,7 @@ def mcplot(
     if (data is not None) and isinstance(pred, hist.Hist):
         data.plot(ax=ax, color='black', histtype='errorbar')
     ax.set_xlim(l_edge, r_edge)
-    if combine_fit != "prefit" and combine_histo_edges is not None:
+    if combine_fit != "pre-combine" and combine_histo_edges is not None:
         # override to fix combine stripping the axis edges from the histograms, replacing them with bin numbers
         assert len(combine_histo_edges) == len(bx.get_xticks()), f"mismatch of edges({combine_histo_edges}) and xticks({bx.get_xticks()})"
         bx.set_xticks(bx.get_xticks(), labels=combine_histo_edges)
