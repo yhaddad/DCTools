@@ -51,7 +51,6 @@ def plotting(config, variable, channel, rebin=1, xlim=[], blind=False, era="some
             datasets[p.name] = p
             if p.ptype == "signal":
                 signal = p.name
-                print(p)
         else:
             # handle the combine prefit or postfit inputs similarly to the pre-combine path, with a channel selection ala dctools.datagroup
             if ng == 0:
@@ -195,6 +194,7 @@ def main():
         do_groups = (isinstance(options.combine_channel_groups, list) and len(options.combine_channel_groups) > 0)
         at_least_one = do_channels or do_groups
         assert at_least_one, "In combine output mode, must have a channel or at least one combine_channel_group name"
+        assert options.variables, "In combine output mode, must specify variables to be plotted"
 
         #plot individual channels
         if options.channels:
@@ -234,11 +234,11 @@ def main():
 
     elif options.combine_fit == "pre-combine":
         for channel in config.plotting:
-            if len(options.channels) > 0 and channel not in options.channels:
+            if options.channels and len(options.channels) > 0 and channel not in options.channels:
                 continue
             ch_cfg = config.plotting[channel]
             for vname in ch_cfg:
-                if len(options.variables) > 0 and vname not in options.variables:
+                if options.variables and len(options.variables) > 0 and vname not in options.variables:
                     continue
                 v_cfg = ch_cfg[vname]
                 _ = plotting(config, vname, channel,

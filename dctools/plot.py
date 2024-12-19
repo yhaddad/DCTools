@@ -216,7 +216,7 @@ def mcplot(
            height = np.divide(2*pred_stat_error, pred_values, where=pred_values!=0), 
            width  = (r_edge - l_edge) / len(x_vals),
            bottom = 1 - np.divide(pred_stat_error,pred_values, where=pred_values!=0),
-           color  = "red",
+           color  = "red" if (combine_fit == "pre-combine") else "blue",
            alpha  = 0.4,
            label="stat" if (combine_fit == "pre-combine") else "stat+syst",
     )
@@ -287,7 +287,7 @@ def mcplot(
                width  = (r_edge - l_edge) / len(x_vals),
                bottom = np.divide(pred_values - syst_uncert_dw, pred_values, where=pred_values!=0),
                color  = "blue", alpha  = 0.2, zorder = 0,
-               label="syst"
+               label="stat+syst"
         )
     
     if isinstance(pred, hist.Hist):
@@ -302,6 +302,14 @@ def mcplot(
         # override to fix combine stripping the axis edges from the histograms, replacing them with bin numbers
         assert len(combine_histo_edges) == len(bx.get_xticks()), f"mismatch of edges({combine_histo_edges}) and xticks({bx.get_xticks()})"
         bx.set_xticks(bx.get_xticks(), labels=combine_histo_edges)
+    fit_label = {"pre-combine": "Prefit", "prefit": "Prefit", "fit_b": "Postfit (background only)", "fit_s": "Postfit (s+b)"}[combine_fit]
+    # ax.text(
+    #     0.02, 0.05, fit_label,
+    #     color="black",
+    #     fontsize=15, horizontalalignment='left',
+    #     verticalalignment='bottom',
+    #     transform=ax.transAxes
+    # )
     ax.legend(ncol=2, loc='upper right', fontsize=15)
     bx.legend(loc='upper right', fontsize=15)
     bx.set_xlabel(pred_ksum.axes[0].label)
