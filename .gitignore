@@ -3,6 +3,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Specific to DCTools
+cards-*
+*.root
+*.gz 
+*.pkl
+*.pdf
+*.png
+*.pkl
+cards-*
+
 # C extensions
 *.so
 

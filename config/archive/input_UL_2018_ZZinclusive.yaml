@@ -1,0 +1,101 @@
+VVV:
+  files:
+    - ./eos/WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+    - ./eos/WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+    - ./eos/WZZ_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+    - ./eos/ZZZ_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+  type:
+    background
+  color: 38
+ZZ:
+  files:
+    - ./eos/GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+    - ./eos/GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+    - ./eos/GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+    - ./eos/GluGluToContinToZZTo4e_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+    - ./eos/GluGluToContinToZZTo4mu_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+    - ./eos/GluGluToContinToZZTo4tau_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+  type:
+    background
+  color: 798
+WW:
+  files:
+    - ./eos/WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/merge.root
+    - ./eos/GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/GluGluToWWToENTN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/GluGluToWWToMNTN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/GluGluToWWToTNMN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+    - ./eos/GluGluToWWToTNTN_TuneCP5_13TeV_MCFM701_pythia8/merge.root
+  type:
+    background
+  color: 842
+ZZ2l2nu:
+  files:
+    - ./eos/ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8/merge.root
+    - ./eos/GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+    - ./eos/GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8/merge.root
+  type:
+    signal
+  color: 895
+WZ:
+  files:
+    - ./eos/WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+  type:
+    background
+  kfactor: 1.0 # 1.23
+  color: 856
+DY:
+  files:
+    - ./eos/DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos/merge.root
+    - ./eos/DYJetsToLL_Pt-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/DYJetsToLL_Pt-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8/merge.root
+    - ./eos/EWKZ2Jets_ZToLL_M-50_TuneCP5_withDipoleRecoil_13TeV-madgraph-pythia8/merge.root
+  type:
+    background
+  kfactor: 1.0
+  color: 901
+TOP:
+  files:
+    - ./eos/ST_tW_antitop_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/merge.root
+    - ./eos/ST_tW_top_5f_inclusiveDecays_TuneCP5_13TeV-powheg-pythia8/merge.root
+    - ./eos/ST_tW_antitop_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/merge.root
+    - ./eos/ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8/merge.root
+    - ./eos/ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+    - ./eos/tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+    - ./eos/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/merge.root
+    - ./eos/TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/merge.root
+    - ./eos/TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8/merge.root
+    - ./eos/TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+    - ./eos/TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8/merge.root
+  type:
+    background
+  color: 124
+  kfactor: 1.0
+data:
+  files:
+    - ./eos/DoubleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/DoubleMuon_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/DoubleMuon_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/DoubleMuon_Run2018D-UL2018_MiniAODv2_NanoAODv9-v2/merge.root
+    - ./eos/EGamma_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/EGamma_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/EGamma_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/EGamma_Run2018D-UL2018_MiniAODv2_NanoAODv2-v3/merge.root
+    - ./eos/MuonEG_Run2018A-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/MuonEG_Run2018B-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/MuonEG_Run2018C-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/MuonEG_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+    - ./eos/SingleMuon_Run2018A-UL2018_MiniAODv2_NanoAODv9-v2/merge.root
+    - ./eos/SingleMuon_Run2018B-UL2018_MiniAODv2_NanoAODv9-v2/merge.root
+    - ./eos/SingleMuon_Run2018C-UL2018_MiniAODv2_NanoAODv9-v2/merge.root
+    - ./eos/SingleMuon_Run2018D-UL2018_MiniAODv2_NanoAODv9-v1/merge.root
+  type:
+    data
+  color: 1
+

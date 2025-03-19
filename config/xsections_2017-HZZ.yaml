@@ -1,3 +1,4 @@
+# place holder for 2017
 WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
@@ -162,7 +163,7 @@ ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8:
 ZZ2JTo2L2Nu2J_EWK_aQGC_TuneCP5_13TeV-madgraph-pythia8:
   br: 1.0
   kr: 1.0
-  xsec: 0.1374
+  xsec: 0.00308
 GluGluToContinToZZTo2e2mu_13TeV_TuneCP5_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
@@ -375,6 +376,10 @@ DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_massWgtFix_TuneCP5_13TeV-powhegMiNNLO-p
   br: 1.0
   kr: 1.0
   xsec: 583
+DYJetsToTauTau_M-50_AtLeastOneEorMuDecay_TuneCP5_13TeV-powhegMiNNLO-pythia8-photos:
+  br: 1.0
+  kr: 1.0
+  xsec: 1976
 DYJetsToLL_0J_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
@@ -443,10 +448,6 @@ DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8
   br: 1.0
   kr: 1.0
   xsec: 0.04728
-WWJJToLNuLNu_OS_EWK_TuneCP5_13TeV_madgraph-pythia8:
-  br: 1.0 
-  kr: 1.0
-  xsec: 0.439
 ZZTo2E2Nu_TuneCP5_DipoleRecoil_13TeV_powheg_pythia8:
   br: 1.0
   kr: 1.0

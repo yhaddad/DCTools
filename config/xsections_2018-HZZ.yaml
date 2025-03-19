@@ -2,6 +2,8 @@ WZTo3LNu_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 5.213
+  mean_weight: 8.46595435742713
+  num_events: 9821283
 DY1JetsToLL_M-50_LHEZpT_150-250_TuneCP5_13TeV-amcnloFXFX-pythia8: 
   br: 1.0
   kr: 1.0
@@ -42,15 +44,21 @@ TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 88.29
+  mean_weight: 72.11211432410185
+  num_events: 145020000
 WZTo3LNu_TuneCP5_13TeV-powheg-pythia8: 
   br: 1.0
   kr: 0.615
   xsec: 4.658000000000000
-#UL
+  mean_weight: 8.46595435742713
+  num_events: 9821283
+    #UL
 ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8: 
   br: 1.0
   kr: 1.0
   xsec: 0.9738
+  mean_weight: 0.9737441463416141
+  num_events: 56886000
 #ZZTo2L2Nu_TuneCP5_13TeV_powheg_pythia8: 
 #  br: 1.0
 #  kr: 1.0
@@ -59,6 +67,8 @@ WWTo2L2Nu_NNPDF31_TuneCP5_13TeV-powheg-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 11.080000000000004
+  mean_weight: 11.086408810716117
+  num_events: 9994000
 GluGluToContinToZZTo2e2mu_13TeV_MCFM701_pythia8: 
   br: 1.0
   kr: 0.001
@@ -67,6 +77,8 @@ GluGluToContinToZZTo2e2nu_13TeV_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
   xsec: 17.723399006136571
+  mean_weight: 1.0
+  num_events: 500000
 GluGluToContinToZZTo2e2tau_13TeV_MCFM701_pythia8: 
   br: 1.0
   kr: 0.001
@@ -75,6 +87,8 @@ GluGluToContinToZZTo2mu2nu_13TeV_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
   xsec: 17.725335790940576
+  mean_weight: 1.0
+  num_events: 500000
 GluGluToContinToZZTo2mu2tau_13TeV_MCFM701_pythia8: 
   br: 1.0
   kr: 0.001
@@ -95,10 +109,14 @@ WZZ_TuneCP5_13TeV-amcatnlo-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.057010000000000
+  mean_weight: 0.05717795133396147
+  num_events: 10294000
 ZZZ_TuneCP5_13TeV-amcatnlo-pythia8: 
   br: 1.0
   kr: 1.0
   xsec: 0.014730000000000
+  mean_weight: 0.01476683237915009
+  num_events: 10139000
 WWZ_TuneCP5_13TeV-amcatnlo-pythia8: 
   br: 1.0
   kr: 1.0
@@ -107,6 +125,8 @@ TTWJetsToLNu_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.218156891833184
+  mean_weight: 0.3351779171650718
+  num_events: 10450000
 TTWJetsToQQ_TuneCP5_13TeV-amcatnloFXFX-madspin-pythia8: 
   br: 1.0
   kr: 1.0
@@ -115,6 +135,8 @@ TTZToLLNuNu_M-10_TuneCP5_13TeV-amcatnlo-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.243200000000000
+  mean_weight: 0.24392659445443188
+  num_events: 19608000
 TTZToQQ_TuneCP5_13TeV-amcatnlo-pythia8: 
   br: 1.0
   kr: 1.0
@@ -155,14 +177,18 @@ WWW_4F_TuneCP5_13TeV-amcatnlo-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.2086
+  mean_weight: 0.21584833523750493
+  num_events: 10134000
 ZZJJ_ZZTo2L2Nu_EWK_dipoleRecoil_TuneCP5_13TeV-madgraph-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.00308
+  mean_weight: 1.0
+  num_events: 385000  
 ZZ2JTo2L2Nu2J_EWK_aQGC_TuneCP5_13TeV-madgraph-pythia8:
   br: 1.0
   kr: 1.0
-  xsec: 0.1374
+  xsec: 0.00308
 GluGluToContinToZZTo2e2mu_13TeV_TuneCP5_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
@@ -283,10 +309,14 @@ ST_tW_top_5f_NoFullyHadronicDecays_TuneCP5_13TeV-powheg-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 32.45
+  mean_weight: 32.44555580399328
+  num_events: 11270430
 WWZ_4F_TuneCP5_13TeV-amcatnlo-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.1707
+  mean_weight: 0.1707785548975413
+  num_events: 10209999
 GluGluToContinToZZTo2e2mu_TuneCP5_13TeV-mcfm701-pythia8:
   br: 1.0
   kr: 0.001
@@ -295,6 +325,8 @@ GluGluToContinToZZTo2e2nu_TuneCP5_13TeV-mcfm701-pythia8:
   br: 1.0
   kr: 0.001
   xsec: 17.73
+  mean_weight: 1.0
+  num_events: 500000
 GluGluToContinToZZTo2e2tau_TuneCP5_13TeV-mcfm701-pythia8:
   br: 1.0
   kr: 0.001
@@ -303,6 +335,8 @@ GluGluToContinToZZTo2mu2nu_TuneCP5_13TeV-mcfm701-pythia8:
   br: 1.0
   kr: 0.001
   xsec: 17.73
+  mean_weight: 1.0
+  num_events: 500000
 GluGluToContinToZZTo2mu2tau_TuneCP5_13TeV-mcfm701-pythia8:
   br: 1.0
   kr: 0.001
@@ -323,10 +357,14 @@ WWTo2L2Nu_TuneCP5_13TeV-powheg-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 11.09
+  mean_weight: 11.086408810716117
+  num_events: 9994000
 GluGluToWWToENEN_TuneCP5_13TeV_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
   xsec: 36.8
+  mean_weight: 1.0
+  num_events: 4904000
 GluGluToWWToENMN_TuneCP5_13TeV_MCFM701_pythia8: 
   br: 1.0
   kr: 0.001
@@ -339,6 +377,8 @@ GluGluToWWToMNMN_TuneCP5_13TeV_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
   xsec: 36.8
+  mean_weight: 1.0
+  num_events: 4986000 
 GluGluToWWToMNEN_TuneCP5_13TeV_MCFM701_pythia8:
   br: 1.0
   kr: 0.001
@@ -415,43 +455,47 @@ ST_s-channel_4f_leptonDecays_TuneCP5_13TeV-amcatnlo-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 3.549
+  mean_weight: 3.5509129928567074
+  num_events: 19365999
 tZq_ll_4f_ckm_NLO_TuneCP5_13TeV-amcatnlo-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.07561
+  mean_weight: 0.07754755833149757
+  num_events: 11916000
 DYJetsToLL_LHEFilterPtZ-0To50_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 1485.0
+  mean_weight: 12382.700805234712
+  num_events: 196207761
 DYJetsToLL_LHEFilterPtZ-100To250_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 97.2
+  mean_weight: 601.498764946905
+  num_events: 51149218
 DYJetsToLL_LHEFilterPtZ-250To400_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 3.701
+  mean_weight: 15.297532520351036
+  num_events: 24195330
 DYJetsToLL_LHEFilterPtZ-400To650_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.5086
+  mean_weight: 1.7063619289017964
+  num_events: 3936102
 DYJetsToLL_LHEFilterPtZ-50To100_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 397.4
+  mean_weight: 4699.377685872854
+  num_events: 122967660
 DYJetsToLL_LHEFilterPtZ-650ToInf_MatchEWPDG20_TuneCP5_13TeV-amcatnloFXFX-pythia8:
   br: 1.0
   kr: 1.0
   xsec: 0.04728
-WWJJToLNuLNu_OS_EWK_TuneCP5_13TeV_madgraph-pythia8:
-  br: 1.0 
-  kr: 1.0
-  xsec: 0.439
-ZZTo2E2Nu_TuneCP5_DipoleRecoil_13TeV_powheg_pythia8:
-  br: 1.0
-  kr: 1.0
-  xsec: 0.001583
-ZZTo2Mu2Nu_TuneCP5_DipoleRecoil_13TeV_powheg_pythia8:
-  br: 1.0
-  kr: 1.0
-  xsec: 0.001583
+  mean_weight: 0.16467020851672026
+  num_events: 3994997
